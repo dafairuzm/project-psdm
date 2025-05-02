@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
+use App\Models\JobTitle;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+    protected static ?string $navigationGroup = 'Pegawai';
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Pengguna';
@@ -57,15 +59,12 @@ class UserResource extends Resource
                     ->label('Golongan')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Select::make('job_title')
+                Forms\Components\Select::make('job_title_id')
+                    ->required()
+                    ->relationship('jobTitle', 'name')
                     ->label('Jabatan')
-                    ->options([
-                        'dokter' => 'Dokter',
-                        'perawat' => 'Perawat',
-                        't.kes lain' => 'Tenaga Kesehatan Lain',
-                        'manajemen' => 'Manajemen',
-                    ])
-                    ->required(),
+                    ->searchable()
+                    ->preload(),
                 Forms\Components\TextInput::make('title_complete')
                     ->label('Jabatan Lengkap')
                     ->required()
@@ -102,15 +101,10 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('employee_class')
                     ->label('Golongan')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('job_title')
+                Tables\Columns\TextColumn::make('jobTitle.name')
                     ->label('Jabatan')
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'dokter' => 'Dokter',
-                        'perawat' => 'Perawat',
-                        't.kes lain' => 'Tenaga Kesehatan Lain',
-                        'manajemen' => 'Manajemen',
-                    }),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('title_complete')
                     ->label('Jabatan Lengkap')
                     ->searchable()
