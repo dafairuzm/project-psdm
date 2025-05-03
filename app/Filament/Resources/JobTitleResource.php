@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Filament\Resources\JobTitleResource\RelationManagers\UsersRelationManager;
 
 class JobTitleResource extends Resource
 {
@@ -75,5 +76,11 @@ class JobTitleResource extends Resource
             'create' => Pages\CreateJobTitle::route('/create'),
             'edit' => Pages\EditJobTitle::route('/{record}/edit'),
         ];
+    }
+    public static function getRelations(): array
+    {
+    return [
+        UsersRelationManager::class,
+    ];
     }
 } 
