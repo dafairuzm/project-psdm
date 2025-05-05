@@ -31,4 +31,18 @@ class Activity extends Model
     {
         return $this->belongsTo(ActivityCategory::class, 'category_id');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_activity')
+            ->withPivot('attendance_status')
+            ->withTimestamps();
+    }
+
+    public function userActivities()
+    {
+        return $this->hasMany(UserActivity::class);
+    }
+
+
 }
