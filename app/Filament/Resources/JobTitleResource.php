@@ -18,6 +18,10 @@ class JobTitleResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
 
     protected static ?string $navigationGroup = 'Pegawai';
+    protected static ?string $modelLabel = 'Jabatan';
+    protected static ?string $pluralModelLabel = 'Jabatan';
+
+
 
     protected static ?int $navigationSort = 2;
 
