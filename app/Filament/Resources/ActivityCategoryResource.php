@@ -19,6 +19,8 @@ class ActivityCategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Kegiatan';
+
     protected static ?string $navigationLabel = 'Kategori Kegiatan';
 
     protected static ?string $modelLabel = 'Kategori Kegiatan';

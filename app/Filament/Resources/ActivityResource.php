@@ -11,13 +11,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Enums\FiltersLayout;
-use Filament\Resources\Components\Tab;
+use App\Filament\Resources\ActivityResource\RelationManagers\UserActivityRelationManager;
 
 class ActivityResource extends Resource
 {
     protected static ?string $model = Activity::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
+
+    protected static ?string $navigationGroup = 'Kegiatan';
 
     protected static ?string $navigationLabel = 'Kegiatan';
 
@@ -127,6 +129,13 @@ class ActivityResource extends Resource
             'index' => Pages\ListActivities::route('/'),
             'create' => Pages\CreateActivity::route('/create'),
             'edit' => Pages\EditActivity::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            UserActivityRelationManager::class,
         ];
     }
 }

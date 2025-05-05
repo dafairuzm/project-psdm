@@ -19,6 +19,12 @@ class JobTitleResource extends Resource
 
     protected static ?string $navigationGroup = 'Pegawai';
 
+    protected static ?string $navigationLabel = 'Jabatan';
+
+    protected static ?string $modelLabel = 'Jabatan';
+
+    protected static ?string $pluralModelLabel = 'Jabatan';
+
     protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
