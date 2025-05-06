@@ -18,7 +18,6 @@ class UserSeeder extends Seeder
             'role' => 'admin',
             'nip' => '123456789',
             'employee_class' => 'IV/a',
-            'job_title' => 'manajemen',
             'title_complete' => 'Kepala Bagian SDM'
         ]);
 
@@ -30,7 +29,6 @@ class UserSeeder extends Seeder
             'role' => 'user',
             'nip' => '987654321',
             'employee_class' => 'III/d',
-            'job_title' => 'dokter',
             'title_complete' => 'Dokter Spesialis Penyakit Dalam'
         ]);
     }
