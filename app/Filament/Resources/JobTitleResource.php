@@ -30,7 +30,8 @@ class JobTitleResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255)
-                    ->label('Nama Jabatan'),
+                    ->label('Nama Jabatan')
+                    ->unique(ignoreRecord: true),
                 Forms\Components\Textarea::make('description')
                     ->maxLength(65535)
                     ->columnSpanFull()

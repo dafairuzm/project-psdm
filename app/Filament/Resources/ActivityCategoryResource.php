@@ -36,6 +36,7 @@ class ActivityCategoryResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->label('Nama Kategori')
                     ->required()
+                    ->unique(ignoreRecord: true)
                     ->maxLength(255),
                 Forms\Components\Textarea::make('description')
                     ->label('Deskripsi')

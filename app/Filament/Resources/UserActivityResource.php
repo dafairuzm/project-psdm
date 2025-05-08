@@ -24,8 +24,9 @@ class UserActivityResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('user_id')
-                    ->label('User')
+                    ->label('Peserta')
                     ->relationship('user', 'name')
+                    //->unique(ignoreRecord: true)
                     ->required(),
 
                 Forms\Components\Select::make('activity_id')

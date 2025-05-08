@@ -66,7 +66,7 @@ class ActivityResource extends Resource
                 Forms\Components\DatePicker::make('finish_date')
                     ->label('Tanggal Selesai')
                     ->required()
-                    ->after('start_date')
+                    ->rule('after_or_equal:start_date')
                     ->format('Y-m-d'),
                 Forms\Components\TextInput::make('duration')
                     ->label('Durasi (Jam pelajaran)')
@@ -110,6 +110,14 @@ class ActivityResource extends Resource
                     ->label('Durasi (Jam pelajaran)')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('attendance_status')
+                    ->label('Peserta Hadir')
+                    ->getStateUsing(function ($record) {
+                        return $record->userActivities()
+                            ->where('attendance_status', 'Hadir')
+                            ->count();
+                            //->count('attendance_status');
+                    }),
             ])
             ->filters([], layout: FiltersLayout::AboveContent) // tidak pakai filter tambahan
             ->actions([
