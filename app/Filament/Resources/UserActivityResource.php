@@ -17,7 +17,12 @@ class UserActivityResource extends Resource
 {
     protected static ?string $model = UserActivity::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Kegiatan';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationLabel = 'Peserta';
+    protected static ?string $modelLabel = 'Peserta';
+    protected static ?string $pluralModelLabel = 'Peserta';
+     protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {

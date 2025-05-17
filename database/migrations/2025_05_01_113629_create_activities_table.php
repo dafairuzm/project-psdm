@@ -22,6 +22,7 @@ return new class extends Migration
             $table->dateTime('start_date');
             $table->dateTime('finish_date');
             $table->integer('duration'); // dalam jam pelajaran
+            //$table->foreignId('activitydocs_id')->constrained('activity_docs')->onDelete('cascade');
             $table->timestamps();
         });
     }

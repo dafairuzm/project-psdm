@@ -4,8 +4,13 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ActivityResource\Pages;
 use App\Models\Activity;
+use App\Models\ActivityDoc;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
+use Filament\Pages\SubNavigationPosition;
 use Filament\Forms\Form;
+use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -28,6 +33,8 @@ class ActivityResource extends Resource
     protected static ?string $pluralModelLabel = 'Kegiatan';
 
     protected static ?int $navigationSort = 3;
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+
 
     public static function form(Form $form): Form
     {
@@ -73,6 +80,63 @@ class ActivityResource extends Resource
                     ->numeric()
                     ->required()
                     ->minValue(1),
+                // Forms\Components\Grid::make(1)
+                //     ->schema([
+                //         FileUpload::make('temp_documentation')
+                //             ->label('Upload Dokumentasi')
+                //             ->image()
+                //             ->multiple()
+                //             ->directory('activity-docs')
+                //             ->disk('public')
+                //             ->preserveFilenames()
+                //             ->visibility('public'),
+                //         // // ->afterStateUpdated(function ($state, $set, $get, $livewire, $component) {
+                //         // //     if ($livewire->record && is_array($state)) {
+                //         // //         foreach ($state as $uploadedFile) {
+                //         // //             $storedPath = $uploadedFile->storeAs(
+                //         // //                 'activity-docs',
+                //         // //                 $uploadedFile->getClientOriginalName(),
+                //         // //                 'public'
+                //         // //             );
+
+                //         // //             if (
+                //         // //                 !ActivityDoc::where('activity_id', $livewire->record->id)
+                //         // //                     ->where('documentation', $storedPath)
+                //         // //                     ->exists()
+                //         // //             ) {
+                //         // //                 ActivityDoc::create([
+                //         // //                     'activity_id' => $livewire->record->id,
+                //         // //                     'documentation' => $storedPath,
+                //         // //                 ]);
+                //         // //             }
+                //         // //         }
+
+                //         //         $set('temp_documentation', []);
+                //         //     }
+                //         // }),
+
+                //         Placeholder::make('existing_docs_info')
+                //             ->content(fn($record) => '🛈 Terdapat ' . $record->activitydocs->count() . ' dokumentasi yang sudah diunggah. Anda masih bisa menambahkan dokumentasi baru jika diperlukan.')
+                //             ->visible(fn($record) => $record && $record->activitydocs->isNotEmpty())
+                //             ->dehydrated(false),
+                //     ]),
+
+                //->dehydrated(false),
+                // Tampilkan dokumentasi yang sudah tersimpan
+                // Forms\Components\Placeholder::make('Dokumentasi Tersimpan')
+                //     ->content(function ($record) {
+                //         return view('filament.component.activity-docs', [
+                //             'docs' => $record?-> activitydocs ?? [],
+                //         ]);
+                //     })
+                // ->dehydrated(false)
+                // ->columnSpanFull(),
+                // Forms\Components\View::make('filament.component.activity-docs')
+                //     ->label('Dokumentasi Sebelumnya')
+                //     ->visible(fn($record) => $record && $record->activitydocs->isNotEmpty())
+                //     ->viewData([
+                //         'docs' => fn($record) => $record->activitydocs,
+                //     ])
             ]);
     }
 
@@ -116,7 +180,7 @@ class ActivityResource extends Resource
                         return $record->userActivities()
                             ->where('attendance_status', 'Hadir')
                             ->count();
-                            //->count('attendance_status');
+                        //->count('attendance_status');
                     }),
             ])
             ->filters([], layout: FiltersLayout::AboveContent) // tidak pakai filter tambahan
@@ -137,6 +201,8 @@ class ActivityResource extends Resource
             'index' => Pages\ListActivities::route('/'),
             'create' => Pages\CreateActivity::route('/create'),
             'edit' => Pages\EditActivity::route('/{record}/edit'),
+            'activitydocs' => Pages\ManageDocumentation::route('/{record}/activitydocs'),
+            'notes' => Pages\ManageNote::route('/{record}/notes')
         ];
     }
 
@@ -146,4 +212,19 @@ class ActivityResource extends Resource
             UserActivityRelationManager::class,
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with('activitydocs');
+    }
+
+    public static function getRecordSubnavigation(Page $page): array
+    {
+        return $page->generateNavigationItems([
+            Pages\EditActivity::class,
+            Pages\ManageDocumentation::class,
+            Pages\ManageNote::class
+        ]);
+    }
+
 }

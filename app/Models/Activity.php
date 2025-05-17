@@ -19,12 +19,14 @@ class Activity extends Model
         'location',
         'start_date',
         'finish_date',
-        'duration'
+        'duration',
+        //'documentation'
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'finish_date' => 'date',
+        //'documentation' => 'array',
     ];
 
     public function category(): BelongsTo
@@ -44,5 +46,14 @@ class Activity extends Model
         return $this->hasMany(UserActivity::class);
     }
 
+    public function activitydocs()
+    {
+        return $this->hasMany(ActivityDoc::class);
+    }
+
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
 
 }
