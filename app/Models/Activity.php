@@ -34,9 +34,7 @@ class Activity extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_activity')
-            ->withPivot('attendance_status')
-            ->withTimestamps();
+        return $this->belongsToMany(User::class, 'user_activity');
     }
 
     public function userActivities()

@@ -56,4 +56,10 @@ class User extends Authenticatable
         return $this->belongsTo(JobTitle::class);
     }
 
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class, 'user_activity');
+    }
+
+
 }

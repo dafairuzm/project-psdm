@@ -18,7 +18,8 @@ class UserSeeder extends Seeder
             'role' => 'admin',
             'nip' => '123456789',
             'employee_class' => 'IV/a',
-            'title_complete' => 'Kepala Bagian SDM'
+            'title_complete' => 'Kepala Bagian SDM',
+            'job_title' => 'Manajemen',
         ]);
 
         // Dokter
@@ -29,7 +30,28 @@ class UserSeeder extends Seeder
             'role' => 'user',
             'nip' => '987654321',
             'employee_class' => 'III/d',
-            'title_complete' => 'Dokter Spesialis Penyakit Dalam'
+            'title_complete' => 'Dokter Spesialis Penyakit Dalam',
+            'job_title' => 'Dokter',
+        ]);
+        User::create([
+            'name' => 'Daffa',
+            'email' => 'daffa@example.com',
+            'password' => Hash::make('daffa123'),
+            'role' => 'admin',
+            'nip' => '2312412',
+            'employee_class' => 'III/d',
+            'title_complete' => 'Dokter Penyakit',
+            'job_title' => 'Dokter',
+        ]);
+        User::create([
+            'name' => 'Rani',
+            'email' => 'Rani@example.com',
+            'password' => Hash::make('rani123'),
+            'role' => 'user',
+            'nip' => '673334345',
+            'employee_class' => 'III/d',
+            'title_complete' => 'Dokter Gigi',
+            'job_title' => 'Dokter',
         ]);
     }
 } 

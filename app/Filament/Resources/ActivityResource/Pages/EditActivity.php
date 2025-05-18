@@ -10,6 +10,18 @@ class EditActivity extends EditRecord
 {
     protected static string $resource = ActivityResource::class;
 
+    protected static ?string $title = 'Edit Kegiatan';
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Edit Kegiatan';
+    }
+
+    public function getTableModelLabel(): string
+    {
+        return 'Edit Kegiatan';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

@@ -30,15 +30,12 @@ class ListActivities extends ListRecords
 {
     return [
         'all' => Tab::make()
-                    ->label('Semua Kegiatan')
-                    ->icon('heroicon-o-list-bullet'),
+                    ->label('Semua Kegiatan'),
                 'exhouse' => Tab::make()
                     ->label('Kegiatan Exhouse')
-                    ->icon('heroicon-o-building-office')
                     ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'exhouse')),
                 'inhouse' => Tab::make()
                     ->label('Kegiatan Inhouse')
-                    ->icon('heroicon-o-home')
                     ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'inhouse')),
     ];
 }

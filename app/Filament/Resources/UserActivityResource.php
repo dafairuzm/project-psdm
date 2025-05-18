@@ -33,14 +33,6 @@ class UserActivityResource extends Resource
                     ->label('Kegiatan')
                     ->relationship('activity', 'title')
                     ->required(),
-
-                Forms\Components\Select::make('attendance_status')
-                    ->label('Status Kehadiran')
-                    ->options([
-                        'Hadir' => 'Hadir',
-                        'Tidak Hadir' => 'Tidak Hadir',
-                    ])
-                    ->required(),
             ]);
     }
 
@@ -50,7 +42,6 @@ class UserActivityResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('user.name')->label('User'),
                 Tables\Columns\TextColumn::make('activity.title')->label('Kegiatan'),
-                Tables\Columns\TextColumn::make('attendance_status')->label('Kehadiran'),
             ])
             ->filters([
                 //

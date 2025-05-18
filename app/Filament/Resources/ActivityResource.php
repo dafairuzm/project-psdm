@@ -6,12 +6,14 @@ use App\Filament\Resources\ActivityResource\Pages;
 use App\Models\Activity;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Enums\FiltersLayout;
 use App\Filament\Resources\ActivityResource\RelationManagers\UserActivityRelationManager;
+use Filament\Pages\SubNavigationPosition;
 
 class ActivityResource extends Resource
 {
@@ -27,7 +29,10 @@ class ActivityResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Kegiatan';
 
+    protected static ?string $recordTitleAttribute = 'title';
+
     protected static ?int $navigationSort = 3;
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function form(Form $form): Form
     {
@@ -110,16 +115,32 @@ class ActivityResource extends Resource
                     ->label('Durasi (Jam pelajaran)')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('attendance_status')
-                    ->label('Peserta Hadir')
-                    ->getStateUsing(function ($record) {
-                        return $record->userActivities()
-                            ->where('attendance_status', 'Hadir')
-                            ->count();
-                            //->count('attendance_status');
-                    }),
             ])
-            ->filters([], layout: FiltersLayout::AboveContent) // tidak pakai filter tambahan
+            ->filters([
+                Tables\Filters\Filter::make('date_range')
+                    ->form([
+                        Forms\Components\DatePicker::make('start_date')
+                            ->label('Mulai Dari'),
+                        Forms\Components\DatePicker::make('end_date')
+                            ->label('Sampai'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        return $query
+                            ->when($data['start_date'], fn ($q) => $q->whereDate('start_date', '>=', $data['start_date']))
+                            ->when($data['end_date'], fn ($q) => $q->whereDate('finish_date', '<=', $data['end_date']));
+                    }),
+            
+                Tables\Filters\SelectFilter::make('type')
+                    ->label('Tipe Kegiatan')
+                    ->options([
+                        'exhouse' => 'Exhouse',
+                        'inhouse' => 'Inhouse',
+                    ]),
+            
+                Tables\Filters\SelectFilter::make('category_id')
+                    ->label('Kategori')
+                    ->relationship('category', 'name'),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -131,12 +152,21 @@ class ActivityResource extends Resource
             ]);
     }
 
+    public static function getRecordSubNavigation(Page $page): array
+    {
+        return $page->generateNavigationItems([
+            Pages\EditActivity::class,
+            Pages\ManageUserActivities::class,
+        ]);
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListActivities::route('/'),
             'create' => Pages\CreateActivity::route('/create'),
             'edit' => Pages\EditActivity::route('/{record}/edit'),
+            'attendances' => Pages\ManageUserActivities::route('/{record}/attendances'),
         ];
     }
 

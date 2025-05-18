@@ -12,7 +12,6 @@ class UserActivity extends Model
     protected $fillable = [
         'user_id',
         'activity_id',
-        'attendance_status',
     ];
 
     public function user(): BelongsTo
@@ -24,6 +23,12 @@ class UserActivity extends Model
     {
         return $this->belongsTo(Activity::class);
     }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'user_activity_id');
+    }
+
 
 }
 

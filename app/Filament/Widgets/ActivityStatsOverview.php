@@ -13,15 +13,16 @@ class ActivityStatsOverview extends BaseWidget
     protected function getStats(): array
     {
         return [
+            Stat::make('Semua', Activity::count())
+            ->chart([7, 2, 10, 3, 15, 4, 17]),
+                
             Stat::make('Kegiatan Exhouse', Activity::where('type', 'exhouse')->count())
-                ->description('Total kegiatan exhouse')
                 ->color('success')
-                ->chart([7, 3, 4, 5, 6, 3, 5, 3]),
+                ->chart([7, 2, 10, 3, 15, 4, 17]),
 
             Stat::make('Kegiatan Inhouse', Activity::where('type', 'inhouse')->count())
-                ->description('Total kegiatan inhouse')
                 ->color('info')
-                ->chart([3, 5, 3, 4, 5, 6, 3, 7]),
+                ->chart([7, 2, 10, 3, 15, 4, 17]),
         ];
     }
 } 
