@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Imports\UserImporter;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use App\Models\JobTitle;
+use Filament\Actions\ImportAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -46,8 +48,8 @@ class UserResource extends Resource
                 Forms\Components\Select::make('role')
                     ->label('Peran')
                     ->options([
-                        'admin' => 'Administrator',
                         'user' => 'Pengguna',
+                        'admin' => 'Administrator',
                     ])
                     ->required()
                     ->default('user'),
@@ -92,8 +94,8 @@ class UserResource extends Resource
                         'user' => 'success',
                     })
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'admin' => 'Administrator',
                         'user' => 'Pengguna',
+                        'admin' => 'Administrator',
                     }),
                 Tables\Columns\TextColumn::make('nip')
                     ->label('NIP')
@@ -115,10 +117,19 @@ class UserResource extends Resource
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->filters([
                 //
             ])
+
+            // ->headerActions(
+            //     [
+            //         ImportAction::make()
+            //             ->importer(UserImporter::class)
+            //     ]
+
+            // )
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
@@ -136,6 +147,7 @@ class UserResource extends Resource
         ];
     }
 
+
     public static function getPages(): array
     {
         return [
@@ -144,5 +156,4 @@ class UserResource extends Resource
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
     }
-
 }
