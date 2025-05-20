@@ -42,12 +42,12 @@ class ManageUserActivities extends ManageRelatedRecords
 
     public static function getNavigationLabel(): string
     {
-        return 'Peserta & Daftar Hadir';
+        return 'Peserta & Kehadiran';
     }
 
     public function getTableModelLabel(): string
     {
-        return 'Peserta & Daftar Hadir';
+        return 'Peserta & Kehadiran';
     }
 
     public function getTitle(): string | Htmlable

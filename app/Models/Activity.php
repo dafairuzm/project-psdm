@@ -41,6 +41,14 @@ class Activity extends Model
     {
         return $this->hasMany(UserActivity::class);
     }
+    public function activitydocs()
+    {
+        return $this->hasMany(Documentation::class);
+    }
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
 
 
 }

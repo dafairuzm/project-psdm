@@ -60,6 +60,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Activity::class, 'user_activity');
     }
-
+    public function activitydocs()
+    {
+        return $this->hasMany(Documentation::class);
+    }
 
 }

@@ -6,20 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('user');
-            $table->string('nip')->unique();
-            $table->string('employee_class');
-            $table->string('title_complete');
+            $table->foreignId('job_title_id')->nullable()->constrained('job_titles')->onDelete('set null');
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['role', 'nip', 'employee_class', 'job_title', 'title_complete']);
+            //
         });
     }
-}; 
+};
