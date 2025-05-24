@@ -16,7 +16,6 @@ class ActivitySeeder extends Seeder
         Activity::create([
             'title' => 'Seminar Dokter Jaya',
             'type' => 'Inhouse',
-            'category_id' => '1', 
             'speaker' => 'Daffa Putra',
             'organizer' => 'Divisi Pelatihan',
             'location' => 'Ruang 401, Gedung A',
@@ -27,9 +26,8 @@ class ActivitySeeder extends Seeder
         Activity::create([
             'title' => 'Workshop Digital',
             'type' => 'Inhouse',
-            'category_id' => '2', 
             'speaker' => 'Daffa Putra',
-            'organizer' => 'Divisi Pelatihan',
+            'organizer' => 'PMI',
             'location' => 'Ruang 401, Gedung A',
             'start_date' => Carbon::parse('2025-05-15'),
             'finish_date' => Carbon::parse('2025-05-16'),
@@ -38,9 +36,8 @@ class ActivitySeeder extends Seeder
         Activity::create([
             'title' => 'Diklat Dokter Gigi',
             'type' => 'Exhouse',
-            'category_id' => '3', 
             'speaker' => 'Daffa Putra',
-            'organizer' => 'Divisi Pelatihan',
+            'organizer' => 'Kemenkes',
             'location' => 'Ruang 401, Gedung A',
             'start_date' => Carbon::parse('2025-05-15'),
             'finish_date' => Carbon::parse('2025-05-18'),

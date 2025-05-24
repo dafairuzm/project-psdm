@@ -24,19 +24,16 @@ use Filament\Infolists\Components\Split;
 class ActivityResource extends Resource
 {
     protected static ?string $model = Activity::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
-
     protected static ?string $navigationGroup = 'Kegiatan';
-
     protected static ?string $navigationLabel = 'Kegiatan';
-
     protected static ?string $modelLabel = 'Kegiatan';
-
     protected static ?string $pluralModelLabel = 'Kegiatan';
-
+    public static function getNavigationSort(): int
+    {
+        return 1; // Angka lebih kecil = lebih atas di sidebar
+    }
     protected static ?string $recordTitleAttribute = 'title';
-
     protected static ?int $navigationSort = 3;
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
@@ -55,10 +52,11 @@ class ActivityResource extends Resource
                         'inhouse' => 'Inhouse',
                     ])
                     ->required(),
-                Forms\Components\Select::make('category_id')
-                    ->label('Kategori')
-                    ->relationship('category', 'name')
-                    ->required(),
+                Forms\Components\MultiSelect::make('categories')
+                    ->relationship('categories', 'name')
+                    ->columns(2)
+                    ->preload()
+                    ->label('Kategori'),
                 Forms\Components\TextInput::make('speaker')
                     ->label('Pembicara')
                     ->maxLength(255),
@@ -97,7 +95,7 @@ class ActivityResource extends Resource
                 Tables\Columns\TextColumn::make('type')
                     ->label('Tipe')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('category.name')
+                Tables\Columns\TextColumn::make('categories.name')
                     ->label('Kategori')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('speaker')
@@ -132,20 +130,20 @@ class ActivityResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data) {
                         return $query
-                            ->when($data['start_date'], fn ($q) => $q->whereDate('start_date', '>=', $data['start_date']))
-                            ->when($data['end_date'], fn ($q) => $q->whereDate('finish_date', '<=', $data['end_date']));
+                            ->when($data['start_date'], fn($q) => $q->whereDate('start_date', '>=', $data['start_date']))
+                            ->when($data['end_date'], fn($q) => $q->whereDate('finish_date', '<=', $data['end_date']));
                     }),
-            
+
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Tipe Kegiatan')
                     ->options([
                         'exhouse' => 'Exhouse',
                         'inhouse' => 'Inhouse',
                     ]),
-            
-                Tables\Filters\SelectFilter::make('category_id')
+
+                Tables\Filters\SelectFilter::make('categories')
                     ->label('Kategori')
-                    ->relationship('category', 'name'),
+                    ->relationship('categories', 'name'),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -160,73 +158,73 @@ class ActivityResource extends Resource
     }
 
     public static function infolist(Infolist $infolist): Infolist
-{
-    return $infolist
-        ->schema([
-            Section::make('Informasi Utama')
-                ->schema([
-                    Split::make([
-                        Components\Grid::make(2)
-                            ->schema([
-                                Components\Group::make([
-                                    TextEntry::make('title')
-                                        ->label('Judul Kegiatan'),
-                                    TextEntry::make('type')
-                                        ->label('Tipe Kegiatan')
-                                        ->badge()
-                                        ->color(fn (string $state): string => $state === 'inhouse' ? 'success' : 'info'),
-                                    TextEntry::make('category.name')
-                                        ->label('Kategori'),
-                                    TextEntry::make('organizer')
-                                        ->label('Penyelenggara'),
+    {
+        return $infolist
+            ->schema([
+                Section::make('Informasi Utama')
+                    ->schema([
+                        Split::make([
+                            Components\Grid::make(2)
+                                ->schema([
+                                    Components\Group::make([
+                                        TextEntry::make('title')
+                                            ->label('Judul Kegiatan'),
+                                        TextEntry::make('type')
+                                            ->label('Tipe Kegiatan')
+                                            ->badge()
+                                            ->color(fn(string $state): string => $state === 'inhouse' ? 'success' : 'info'),
+                                        TextEntry::make('categories.name')
+                                            ->label('Kategori'),
+                                        TextEntry::make('organizer')
+                                            ->label('Penyelenggara'),
+                                    ]),
+                                    Components\Group::make([
+                                        TextEntry::make('speaker')
+                                            ->label('Pembicara'),
+                                        TextEntry::make('location')
+                                            ->label('Lokasi'),
+                                        TextEntry::make('start_date')
+                                            ->label('Tanggal Mulai')
+                                            ->date('d F Y'),
+                                        TextEntry::make('finish_date')
+                                            ->label('Tanggal Selesai')
+                                            ->date('d F Y'),
+                                        TextEntry::make('duration')
+                                            ->label('Durasi')
+                                            ->suffix('Jam Pelajaran'),
+                                    ]),
                                 ]),
-                                Components\Group::make([
-                                    TextEntry::make('speaker')
-                                        ->label('Pembicara'),
-                                    TextEntry::make('location')
-                                        ->label('Lokasi'),
-                                    TextEntry::make('start_date')
-                                        ->label('Tanggal Mulai')
-                                        ->date('d F Y'),
-                                    TextEntry::make('finish_date')
-                                        ->label('Tanggal Selesai')
-                                        ->date('d F Y'),
-                                    TextEntry::make('duration')
-                                        ->label('Durasi')
-                                        ->suffix('Jam Pelajaran'),
-                                ]),
-                            ]),
-                    ])->from('md'),
-                ]),
+                        ])->from('md'),
+                    ]),
 
-            Section::make('Dokumentasi')
-                ->schema([
-                    ImageEntry::make('activitydocs.documentation')
-                        ->label('')
-                        ->grow(false)
-                        ->columnSpanFull()
-                        ->columns(2)
-                ])
-                ->collapsible(),
+                Section::make('Dokumentasi')
+                    ->schema([
+                        ImageEntry::make('activitydocs.documentation')
+                            ->label('')
+                            ->grow(false)
+                            ->columnSpanFull()
+                            ->columns(2)
+                    ])
+                    ->collapsible(),
 
-            Section::make('Catatan Kegiatan')
-                ->schema([
-                    TextEntry::make('notes.note')
-                        ->prose()
-                        ->markdown()
-                        ->hiddenLabel()
-                        ->formatStateUsing(function ($state) {
-                            $notes = collect(explode(',', $state))
-                                ->map(fn ($note) => '<li>' . trim($note) . '</li>')
-                                ->implode('');
-                    
-                            return "<ul class='list-disc list-inside pl-4'>" . $notes . "</ul>";
-                        })
-                        ->html(),
-                ])
-                ->collapsible(),
-        ]);
-}
+                Section::make('Catatan Kegiatan')
+                    ->schema([
+                        TextEntry::make('notes.note')
+                            ->prose()
+                            ->markdown()
+                            ->hiddenLabel()
+                            ->formatStateUsing(function ($state) {
+                                $notes = collect(explode(',', $state))
+                                    ->map(fn($note) => '<li>' . trim($note) . '</li>')
+                                    ->implode('');
+
+                                return "<ul class='list-disc list-inside pl-4'>" . $notes . "</ul>";
+                            })
+                            ->html(),
+                    ])
+                    ->collapsible(),
+            ]);
+    }
 
     public static function getRecordSubNavigation(Page $page): array
     {

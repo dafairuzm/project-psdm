@@ -15,8 +15,9 @@ class ActivityCategory extends Model
         'description'
     ];
 
-    public function activities(): HasMany
+    public function activities()
     {
-        return $this->hasMany(Activity::class, 'category_id');
+        return $this->belongsToMany(Activity::class,'activity_activity_category');
     }
+
 }

@@ -27,10 +27,11 @@ class Activity extends Model
         'finish_date' => 'date',
     ];
 
-    public function category(): BelongsTo
+    public function categories()
     {
-        return $this->belongsTo(ActivityCategory::class, 'category_id');
+        return $this->belongsToMany(ActivityCategory::class,'activity_activity_category');
     }
+
 
     public function users()
     {

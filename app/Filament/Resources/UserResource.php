@@ -24,6 +24,11 @@ class UserResource extends Resource
     protected static ?string $modelLabel = 'Pegawai';
     protected static ?string $pluralModelLabel = 'Pegawai';
 
+    public static function getNavigationSort(): int
+    {
+        return 3; // Angka lebih kecil = lebih atas di sidebar
+    }
+
     public static function form(Form $form): Form
     {
         return $form

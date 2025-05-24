@@ -16,7 +16,9 @@ class ListActivities extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label('Tambah Kegiatan')
+                ->icon('heroicon-o-plus'),
         ];
     }
 
@@ -27,17 +29,17 @@ class ListActivities extends ListRecords
         ];
     }
     public function getTabs(): array
-{
-    return [
-        'all' => Tab::make()
-                    ->label('Semua Kegiatan'),
-                'exhouse' => Tab::make()
-                    ->label('Kegiatan Exhouse')
-                    ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'exhouse')),
-                'inhouse' => Tab::make()
-                    ->label('Kegiatan Inhouse')
-                    ->modifyQueryUsing(fn (Builder $query) => $query->where('type', 'inhouse')),
-    ];
-}
+    {
+        return [
+            'all' => Tab::make()
+                ->label('Semua Kegiatan'),
+            'exhouse' => Tab::make()
+                ->label('Kegiatan Exhouse')
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'exhouse')),
+            'inhouse' => Tab::make()
+                ->label('Kegiatan Inhouse')
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'inhouse')),
+        ];
+    }
 
 }

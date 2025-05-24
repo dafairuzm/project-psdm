@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('role')->default('user');
-            $table->string('nip')->unique();
-            $table->string('employee_class');
-            $table->string('title_complete');
+            $table->string('nip')->nullable();
+            $table->string('employee_class')->nullable();
+            $table->string('title_complete')->nullable();
         });
     }
 

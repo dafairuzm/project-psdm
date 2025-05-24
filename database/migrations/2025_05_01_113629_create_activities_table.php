@@ -14,14 +14,13 @@ return new class extends Migration
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('type');
-            $table->foreignId('category_id')->constrained('activity_categories')->onDelete('cascade');
+            $table->enum('type', ['exhouse', 'inhouse']);
             $table->string('speaker')->nullable();
-            $table->string('organizer');
-            $table->string('location');
+            $table->string('organizer')->nullable();
+            $table->string('location')->nullable();
             $table->dateTime('start_date');
             $table->dateTime('finish_date');
-            $table->integer('duration'); // dalam jam pelajaran
+            $table->integer('duration')->nullable(); // dalam jam pelajaran
             $table->timestamps();
         });
     }
