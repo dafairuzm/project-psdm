@@ -17,11 +17,11 @@ class ActivityStatsOverview extends BaseWidget
             ->chart([7, 2, 10, 3, 15, 4, 17]),
                 
             Stat::make('Kegiatan Exhouse', Activity::where('type', 'exhouse')->count())
-                ->color('success')
+                ->color('warning')
                 ->chart([7, 2, 10, 3, 15, 4, 17]),
 
             Stat::make('Kegiatan Inhouse', Activity::where('type', 'inhouse')->count())
-                ->color('info')
+                ->color('primary')
                 ->chart([7, 2, 10, 3, 15, 4, 17]),
         ];
     }

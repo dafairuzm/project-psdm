@@ -4,6 +4,7 @@ namespace App\Filament\Resources\UserActivityResource\Pages;
 
 use App\Filament\Imports\UserActivityImporter;
 use App\Filament\Resources\UserActivityResource;
+use App\Filament\Widgets\ActivityStatsOverview;
 use App\Imports\UserActivitiesImport;
 use Filament\Actions;
 use Filament\Actions\Action;
@@ -11,6 +12,8 @@ use Filament\Actions\ImportAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Resources\Pages\ListRecords\Tab;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ListUserActivities extends ListRecords
@@ -107,6 +110,33 @@ class ListUserActivities extends ListRecords
                 Pastikan format file Excel sesuai dengan template.
                 File harus memiliki header di baris pertama. Data yang sudah ada akan dilewati')
                 ->modalSubmitActionLabel('Import'),
+        ];
+    }
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            ActivityStatsOverview::class,
+        ];
+    }
+    public function getTabs(): array
+    {
+        return [
+            'all' => Tab::make()
+                ->label('Semua Kegiatan'),
+            'exhouse' => Tab::make()
+                ->label('Kegiatan Exhouse')
+                ->modifyQueryUsing(function (Builder $query) {
+                    return $query->whereHas('activity', function ($q) {
+                        $q->where('type', 'exhouse');
+                    });
+                }),
+            'inhouse' => Tab::make()
+            ->label('Kegiatan Inhouse')
+            ->modifyQueryUsing(function (Builder $query) {
+                return $query->whereHas('activity', function ($q) {
+                    $q->where('type', 'inhouse');
+                });
+            }),
         ];
     }
 }

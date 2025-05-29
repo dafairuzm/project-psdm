@@ -55,6 +55,11 @@ class UserResource extends Resource
                     ])
                     ->required()
                     ->default('user'),
+                Forms\Components\Select::make('roles')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
                 Forms\Components\TextInput::make('nip')
                     ->label('NIP')
                     ->required()
@@ -99,6 +104,8 @@ class UserResource extends Resource
                         'admin' => 'Administrator',
                         'user' => 'Pengguna',
                     }),
+                Tables\Columns\TextColumn::make('roles.name')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('nip')
                     ->label('NIP')
                     ->searchable()
@@ -127,9 +134,7 @@ class UserResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                    Tables\Actions\DeleteBulkAction::make()
             ]);
     }
 

@@ -27,9 +27,13 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->font('Inter')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Emerald,
             ])
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->brandLogo(asset('storage/images/logo1.svg'))
+            ->brandName('SIMAK PSDM')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -54,6 +58,9 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->plugins([
+                \BezhanSalleh\FilamentShield\FilamentShieldPlugin::make(),
             ]);
     }
 }

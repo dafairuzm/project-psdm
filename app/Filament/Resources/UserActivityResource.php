@@ -68,8 +68,8 @@ class UserActivityResource extends Resource
                 Tables\Columns\TextColumn::make('user.name')
                     ->label('Nama Pegawai')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('user.nip')
-                    ->label('NIP'),
+                Tables\Columns\TextColumn::make('user.employee_class')
+                    ->label('Pangkat/Gol'),
                 Tables\Columns\TextColumn::make('user.title_complete')
                     ->label('Jabatan')
                     ->searchable(),
@@ -78,15 +78,17 @@ class UserActivityResource extends Resource
                     ->searchable()
                     ->colors([
                         'primary' => 'inhouse',
-                        'info' => 'exhouse',
+                        'warning' => 'exhouse',
                     ]),
                 Tables\Columns\TextColumn::make('activity.title')
                     ->label('Kegiatan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('activity.categories.name')
-                    ->label('Kategori Kegiatan')
+                    ->label('Kategori')
                     ->searchable()
                     ->formatStateUsing(fn($state, $record) => $record->activity?->categories->pluck('name')->join(', ')),
+                Tables\Columns\TextColumn::make('activity.organizer')
+                    ->label('Penyelenggara'),
                 Tables\Columns\TextColumn::make('activity.location')
                     ->label('Lokasi')
                     ->searchable(),
@@ -124,7 +126,7 @@ class UserActivityResource extends Resource
                     ->label('Kategori Kegiatan'),
             ])
             ->actions([
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
