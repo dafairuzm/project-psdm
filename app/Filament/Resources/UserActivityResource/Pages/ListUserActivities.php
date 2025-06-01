@@ -23,12 +23,6 @@ class ListUserActivities extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            // Actions\CreateAction::make()
-            // ->label('Tambah Kegiatan')
-            // ->icon('heroicon-o-plus'),
-            // ImportAction::make()
-            // ->label('Import Kegiatan')
-            // ->importer(UserActivityImporter::class),
             Action::make('import')
                 ->label('Import dari Excel')
                 ->icon('heroicon-o-arrow-up-tray')
@@ -139,4 +133,8 @@ class ListUserActivities extends ListRecords
             }),
         ];
     }
+    protected function getTableRecordAction(): ?string
+{
+    return 'view';
+}
 }

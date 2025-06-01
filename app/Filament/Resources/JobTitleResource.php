@@ -17,7 +17,7 @@ class JobTitleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
 
-    protected static ?string $navigationGroup = 'Pegawai';
+    protected static ?string $navigationGroup = 'Pengguna';
     protected static ?string $modelLabel = 'Jabatan';
     protected static ?string $pluralModelLabel = 'Jabatan';
     protected static ?string $navigationLabel = 'Jabatan';
@@ -48,7 +48,12 @@ class JobTitleResource extends Resource
                     ->label('Nama Jabatan'),
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()
-                    ->label('Deskripsi'),
+                    ->label('Deskripsi')
+                    ->extraAttributes([
+                        'style' => 'width: 400px; max-width: 600px;'
+                    ])
+                    ->limit(60)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

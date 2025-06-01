@@ -11,7 +11,7 @@ return new class extends Migration {
                 $table->id();
                 $table->foreignId('user_activity_id')->constrained('user_activity')->onDelete('cascade'); // relasi ke peserta kegiatan
                 $table->date('date');
-                $table->enum('status', ['Hadir', 'Tidak Hadir', 'Belum Diisi']); // default "Belum Diisi"
+                $table->enum('status', ['Hadir', 'Tidak Hadir', 'Belum Diisi'])->default('Belum Diisi'); // default "Belum Diisi"
                 $table->timestamps();
             
                 // $table->unique(['user_activity_id', 'date']); // Supaya 1 peserta cuma 1 absensi per hari        

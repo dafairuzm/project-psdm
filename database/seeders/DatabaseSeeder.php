@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
             ActivityCategorySeeder::class,
             ActivitySeeder::class,
             UserActivitySeeder::class,
+            ShieldSeeder::class,
+            AssignRoleSeeder::class,
         ]);
     }
 }

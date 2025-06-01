@@ -11,6 +11,12 @@ use App\Models\UserActivity;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Split;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
@@ -82,16 +88,31 @@ class UserActivityResource extends Resource
                     ]),
                 Tables\Columns\TextColumn::make('activity.title')
                     ->label('Kegiatan')
-                    ->searchable(),
+                    ->searchable()
+                    ->extraAttributes([
+                        'style' => 'width: 400px; max-width: 300px;'
+                    ])
+                    ->limit(60)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('activity.categories.name')
                     ->label('Kategori')
                     ->searchable()
                     ->formatStateUsing(fn($state, $record) => $record->activity?->categories->pluck('name')->join(', ')),
                 Tables\Columns\TextColumn::make('activity.organizer')
-                    ->label('Penyelenggara'),
+                    ->label('Penyelenggara')
+                    ->extraAttributes([
+                        'style' => 'width: 300px; max-width: 300px;'
+                    ])
+                    ->limit(60)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('activity.location')
                     ->label('Lokasi')
-                    ->searchable(),
+                    ->searchable()
+                    ->extraAttributes([
+                        'style' => 'width: 300px; max-width: 300px;'
+                    ])
+                    ->limit(60)
+                    ->wrap(),
             ])
             ->filters([
                 Tables\Filters\Filter::make('date_range')
@@ -127,7 +148,9 @@ class UserActivityResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-            ])
+                // Tables\Actions\EditAction::make(),
+                ])
+            ->recordAction('view')
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
                 Tables\Actions\BulkAction::make('export_excel')
@@ -163,6 +186,57 @@ class UserActivityResource extends Resource
                     })
             ]);
     }
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make()
+                    ->schema([
+                        Split::make([
+                            Grid::make(2)
+                                ->schema([
+                                    Group::make([
+                                        TextEntry::make('user.name')
+                                            ->label('Nama Pegawai'),
+                                        TextEntry::make('user.nip')
+                                            ->label('NIP'),
+                                        TextEntry::make('user.employee_class')
+                                            ->label('Pangkat/Gol'),
+                                        TextEntry::make('user.title_complete')
+                                            ->label('Jabatan'),
+                                    ]),
+                                    Group::make([
+                                        TextEntry::make('activity.type')
+                                            ->label('Tipe')
+                                            ->badge()
+                                            ->colors([
+                                                'primary' => 'inhouse',
+                                                'warning' => 'exhouse',
+                                            ]),
+                                        TextEntry::make('activity.title')
+                                            ->label('Kegiatan'),
+                                        TextEntry::make('activity.categories.name')
+                                            ->label('Kategori Kegiatan'),
+                                        TextEntry::make('activity.organizer')
+                                            ->label('Penyelenggara'),
+                                        TextEntry::make('activity.location')
+                                            ->label('Lokasi'),
+                                        TextEntry::make('activity.start_date')
+                                            ->label('Tanggal Mulai')
+                                            ->date('d F Y'),
+                                        TextEntry::make('activity.finish_date')
+                                            ->label('Tanggal Selesai')
+                                            ->date('d F Y'),
+                                        TextEntry::make('activity.duration')
+                                            ->label('Durasi')
+                                            ->suffix('Jam Pelajaran'),
+                                    ]),
+                                ]),
+                        ])->from('md'),
+                    ]),
+
+            ]);
+    }
 
     public static function getRelations(): array
     {
@@ -176,7 +250,8 @@ class UserActivityResource extends Resource
         return [
             'index' => Pages\ListUserActivities::route('/'),
             'create' => Pages\CreateUserActivity::route('/create'),
-            'edit' => Pages\EditUserActivity::route('/{record}/edit'),
+            // 'edit' => Pages\EditUserActivity::route('/{record}/edit'),
+            // 'view' => Pages\ViewUserActivity::route('/{record}/view'),
         ];
     }
     

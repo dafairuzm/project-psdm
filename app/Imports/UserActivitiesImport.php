@@ -75,34 +75,69 @@ class UserActivitiesImport implements ToCollection, WithHeadingRow, WithValidati
     }
 
     protected function findOrCreateUser($row)
-    {
-        $nama = trim($row['nama']);
-        $titleComplete = trim($row['jabatan']);
+{
+    $nama = trim($row['nama']);
+    $titleComplete = trim($row['jabatan']);
 
-        // Cek user berdasarkan nama dan title_complete
-        $user = User::where('name', $nama)
-            ->where('title_complete', $titleComplete)
-            ->first();
+    // Cek user berdasarkan nama dan title_complete
+    $user = User::where('name', $nama)
+        ->where('title_complete', $titleComplete)
+        ->first();
 
-        if (!$user) {
-            // Ambil nilai pangkat/golongan dari kolom 'pangkatgol' atau beri default '-'
-            $employeeClass = !empty($row['pangkatgol']) ? trim($row['pangkatgol']) : '-';
+    if (!$user) {
+        // Ambil nilai pangkat/golongan dari kolom 'pangkatgol' atau beri default '-'
+        $employeeClass = !empty($row['pangkatgol']) ? trim($row['pangkatgol']) : '-';
+
+        try {
+            // Mulai database transaction
+            \DB::beginTransaction();
 
             // Buat user baru
             $user = User::create([
                 'name' => $nama,
                 'email' => $this->generateEmail($nama),
                 'password' => bcrypt('password123'), // Default password
-                'role' => 'user', // Default role
+                // Hapus 'role' => 'user' karena sekarang pakai Spatie Permission
                 'nip' => null, // Biarkan kosong
                 'employee_class' => $employeeClass,
                 'title_complete' => $titleComplete,
                 'job_title_id' => null, // Biarkan kosong sesuai permintaan
             ]);
-        }
 
-        return $user;
+            // Assign default role "Pegawai" menggunakan Spatie Permission
+            $pegawaiRole = \Spatie\Permission\Models\Role::where('name', 'Pegawai')->first();
+            
+            if ($pegawaiRole) {
+                $user->assignRole('Pegawai');
+            } else {
+                // Log warning jika role tidak ada, tapi tetap lanjutkan
+                \Log::warning("Role 'Pegawai' tidak ditemukan saat membuat user", [
+                    'user_name' => $nama,
+                    'user_email' => $user->email
+                ]);
+            }
+
+            // Commit transaction
+            \DB::commit();
+
+        } catch (\Exception $e) {
+            // Rollback jika ada error
+            \DB::rollback();
+            
+            // Log error
+            \Log::error("Gagal membuat user baru", [
+                'user_name' => $nama,
+                'title_complete' => $titleComplete,
+                'error' => $e->getMessage()
+            ]);
+            
+            // Re-throw exception agar proses import bisa handle error
+            throw $e;
+        }
     }
+
+    return $user;
+}
 
     protected function findOrCreateActivity($row)
     {

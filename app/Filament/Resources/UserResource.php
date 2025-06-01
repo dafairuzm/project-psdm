@@ -6,6 +6,7 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use App\Models\JobTitle;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,13 +17,13 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
 {
+    // use HasPageShield;
     protected static ?string $model = User::class;
-    protected static ?string $navigationGroup = 'Pegawai';
-
+    protected static ?string $navigationGroup = 'Pengguna';
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    protected static ?string $navigationLabel = 'Pegawai';
-    protected static ?string $modelLabel = 'Pegawai';
-    protected static ?string $pluralModelLabel = 'Pegawai';
+    protected static ?string $navigationLabel = 'Pengguna';
+    protected static ?string $modelLabel = 'Pengguna';
+    protected static ?string $pluralModelLabel = 'Pengguna';
 
     public static function getNavigationSort(): int
     {
@@ -47,14 +48,6 @@ class UserResource extends Resource
                     ->dehydrated(fn($state) => filled($state))
                     ->required(fn(string $operation): bool => $operation === 'create')
                     ->maxLength(255),
-                Forms\Components\Select::make('role')
-                    ->label('Peran')
-                    ->options([
-                        'admin' => 'Administrator',
-                        'user' => 'Pengguna',
-                    ])
-                    ->required()
-                    ->default('user'),
                 Forms\Components\Select::make('roles')
                     ->relationship('roles', 'name')
                     ->multiple()
@@ -90,37 +83,31 @@ class UserResource extends Resource
                     ->label('Nama')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('nip')
+                        ->label('NIP')
+                        ->searchable()
+                        ->sortable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('role')
-                    ->label('Peran')
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'admin' => 'danger',
-                        'user' => 'success',
-                    })
-                    ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'admin' => 'Administrator',
-                        'user' => 'Pengguna',
-                    }),
-                Tables\Columns\TextColumn::make('roles.name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('nip')
-                    ->label('NIP')
+                Tables\Columns\BadgeColumn::make('roles.name')
                     ->searchable()
-                    ->sortable(),
+                    ->color(fn(string $state): string => match ($state) {
+                        'Admin' => 'danger',
+                        'Pegawai' => 'success',
+                    }),
                 Tables\Columns\TextColumn::make('employee_class')
                     ->label('Golongan')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('jobTitle.name')
                     ->label('Jabatan')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('title_complete')
                     ->label('Jabatan Lengkap')
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d/m/Y H:i')

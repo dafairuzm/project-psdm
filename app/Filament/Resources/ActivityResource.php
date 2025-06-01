@@ -90,8 +90,13 @@ class ActivityResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Judul Kegiatan')
-                    ->searchable(),
+                ->label('Judul Kegiatan')
+                ->searchable()
+                ->extraAttributes([
+                    'style' => 'width: 400px; max-width: 600px;'
+                ])
+                ->limit(60)
+                ->wrap(),
                 Tables\Columns\TextColumn::make('type')
                     ->label('Tipe')
                     ->searchable(),
@@ -103,10 +108,20 @@ class ActivityResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('organizer')
                     ->label('Penyelenggara')
-                    ->searchable(),
+                    ->searchable()
+                    ->extraAttributes([
+                        'style' => 'width: 300px; max-width: 300px;'
+                    ])
+                    ->limit(60)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('location')
                     ->label('Lokasi')
-                    ->searchable(),
+                    ->searchable()
+                    ->extraAttributes([
+                        'style' => 'width: 300px; max-width: 300px;'
+                    ])
+                    ->limit(60)
+                    ->wrap(),
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('Tanggal Mulai')
                     ->date('d F Y')
@@ -252,7 +267,7 @@ class ActivityResource extends Resource
     public static function getRelations(): array
     {
         return [
-            UserActivityRelationManager::class,
+            // UserActivityRelationManager::class,
         ];
     }
 }

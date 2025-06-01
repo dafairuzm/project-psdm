@@ -25,6 +25,11 @@ return [
         'name' => 'super_admin',
         'define_via_gate' => false,
         'intercept_gate' => 'before', // after
+        'define' => [
+        'emails' => [
+            'daffa@example.com', // ganti dengan email kamu
+        ],
+    ],
     ],
 
     'panel_user' => [
