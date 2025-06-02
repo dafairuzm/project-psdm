@@ -125,16 +125,22 @@ class ListUserActivities extends ListRecords
                     });
                 }),
             'inhouse' => Tab::make()
-            ->label('Kegiatan Inhouse')
-            ->modifyQueryUsing(function (Builder $query) {
-                return $query->whereHas('activity', function ($q) {
-                    $q->where('type', 'inhouse');
-                });
-            }),
+                ->label('Kegiatan Inhouse')
+                ->modifyQueryUsing(function (Builder $query) {
+                    return $query->whereHas('activity', function ($q) {
+                        $q->where('type', 'inhouse');
+                    });
+                }),
         ];
     }
     protected function getTableRecordAction(): ?string
-{
-    return 'view';
-}
+    {
+        return 'view';
+    }
+
+    public function getSubheading(): ?string
+    {
+
+        return "Halaman ini menampilkan kegiatan berdasarkan nama pegawai. Anda dapat membuat laporan melalui halaman ini";
+    }
 }
