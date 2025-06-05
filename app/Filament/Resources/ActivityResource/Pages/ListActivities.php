@@ -32,12 +32,12 @@ class ListActivities extends ListRecords
     {
         return [
             'all' => Tab::make()
-                ->label('Semua Kegiatan'),
+                ->label('Semua'),
             'exhouse' => Tab::make()
-                ->label('Kegiatan Exhouse')
+                ->label('Exhouse')
                 ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'exhouse')),
             'inhouse' => Tab::make()
-                ->label('Kegiatan Inhouse')
+                ->label('Inhouse')
                 ->modifyQueryUsing(fn(Builder $query) => $query->where('type', 'inhouse')),
         ];
     }

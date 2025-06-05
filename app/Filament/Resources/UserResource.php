@@ -9,6 +9,13 @@ use App\Models\JobTitle;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Actions\Action;
+use Filament\Infolists\Components\Grid;
+use Filament\Infolists\Components\Group;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Split;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -75,6 +82,38 @@ class UserResource extends Resource
             ]);
     }
 
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make()
+                    ->schema([
+                        Split::make([
+                            Grid::make(2)
+                                ->schema([
+                                    Group::make([
+                                        TextEntry::make('name')->label('Nama Pegawai'),
+                                        TextEntry::make('nip')->label('NIP'),
+                                        TextEntry::make('employee_class')->label('Pangkat/Gol'),
+                                        TextEntry::make('roles.name')
+                                            ->label('Role')
+                                            ->badge()
+                                            ->color(fn(string $state): string => match ($state) {
+                                                'Admin' => 'danger',
+                                                'Pegawai' => 'success',
+                                                default => 'warning',
+                                            }),
+                                    ]),
+                                    Group::make([
+                                        TextEntry::make('jobTitle.name')->label('Jabatan'),
+                                        TextEntry::make('title_complete')->label('Jabatan Lengkap'),
+                                    ]),
+                                ]),
+                        ])->from('md'),
+                    ])
+            ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -84,9 +123,9 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('nip')
-                        ->label('NIP')
-                        ->searchable()
-                        ->sortable(),
+                    ->label('NIP')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
@@ -95,6 +134,7 @@ class UserResource extends Resource
                     ->color(fn(string $state): string => match ($state) {
                         'Admin' => 'danger',
                         'Pegawai' => 'success',
+                        default => 'warning',
                     }),
                 Tables\Columns\TextColumn::make('employee_class')
                     ->label('Golongan')
@@ -118,11 +158,26 @@ class UserResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->label('Lihat')
+                    ->modalHeading('Detail Pengguna')
+                    ->modalActions([
+                        Tables\Actions\Action::make('goToEdit')
+                            ->label('Edit')
+                            ->color('primary')
+                            ->icon('heroicon-o-pencil')
+                            ->url(fn($record) => static::getUrl('edit', ['record' => $record]))
+                            ->openUrlInNewTab(false),
+                    ]),
+                Tables\Actions\EditAction::make()
+                    ->hidden(),
             ])
             ->bulkActions([
-                    Tables\Actions\DeleteBulkAction::make()
-            ]);
+                Tables\Actions\DeleteBulkAction::make()
+            ])
+            ->recordUrl(null)
+            ->recordAction('view')
+        ;
     }
 
     public static function getRelations(): array
@@ -138,6 +193,7 @@ class UserResource extends Resource
             'index' => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
+            'view' => Pages\EditUser::route('/{record}'),
         ];
     }
 

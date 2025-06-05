@@ -13,7 +13,7 @@ class ActivityStatsOverview extends BaseWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Semua', Activity::count())
+            Stat::make('Semua Kegiatan', Activity::count())
             ->chart([7, 2, 10, 3, 15, 4, 17]),
                 
             Stat::make('Kegiatan Exhouse', Activity::where('type', 'exhouse')->count())

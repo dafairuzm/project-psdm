@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Documentation;
+use App\Observers\DocumentationObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -20,5 +22,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Carbon\Carbon::setLocale('id');
+        Documentation::observe(DocumentationObserver::class);
     }
 }

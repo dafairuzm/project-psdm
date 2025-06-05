@@ -10,8 +10,10 @@ use Filament\Forms\Form;
 use Filament\Resources\Pages\ManageRelatedRecords;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\CreateAction;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
@@ -21,7 +23,7 @@ class ManageNote extends ManageRelatedRecords
     protected static string $resource = ActivityResource::class;
     protected static string $relationship = 'notes';
     protected static ?string $navigationLabel = 'Catatan';
-    protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
+    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
 
 
     public function getTitle(): string|Htmlable
@@ -66,10 +68,13 @@ class ManageNote extends ManageRelatedRecords
                 //
             ])
             ->headerActions([
-               CreateAction::make(),
+               CreateAction::make()
+               ->icon('heroicon-o-pencil'),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

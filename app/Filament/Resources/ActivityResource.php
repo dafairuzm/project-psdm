@@ -24,7 +24,7 @@ use Filament\Infolists\Components\Split;
 class ActivityResource extends Resource
 {
     protected static ?string $model = Activity::class;
-    protected static ?string $navigationIcon = 'heroicon-o-calendar';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document';
     protected static ?string $navigationGroup = 'Kegiatan';
     protected static ?string $navigationLabel = 'Kegiatan';
     protected static ?string $modelLabel = 'Kegiatan';
@@ -57,13 +57,13 @@ class ActivityResource extends Resource
                     ->columns(2)
                     ->preload()
                     ->label('Kategori'),
-                Forms\Components\TextInput::make('speaker')
-                    ->label('Pembicara')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('organizer')
+                    Forms\Components\TextInput::make('organizer')
                     ->label('Penyelenggara')
                     ->required()
                     ->maxLength(255),
+                    Forms\Components\TextInput::make('speaker')
+                        ->label('Pembicara')
+                        ->maxLength(255),
                 Forms\Components\TextInput::make('location')
                     ->label('Lokasi')
                     ->required()
@@ -97,9 +97,13 @@ class ActivityResource extends Resource
                 ])
                 ->limit(60)
                 ->wrap(),
-                Tables\Columns\TextColumn::make('type')
+                Tables\Columns\BadgeColumn::make('type')
                     ->label('Tipe')
-                    ->searchable(),
+                    ->searchable()
+                    ->colors([
+                        'primary' => 'inhouse',
+                        'warning' => 'exhouse',
+                    ]),
                 Tables\Columns\TextColumn::make('categories.name')
                     ->label('Kategori')
                     ->sortable(),
@@ -212,29 +216,98 @@ class ActivityResource extends Resource
                     ]),
 
                 Section::make('Dokumentasi')
-                    ->schema([
-                        ImageEntry::make('activitydocs.documentation')
-                            ->label('')
-                            ->grow(false)
-                            ->columnSpanFull()
-                            ->columns(2)
-                    ])
+                ->schema([
+                    TextEntry::make('custom_docs_grid')
+                        ->label('')
+                        ->state(function ($record) {
+                            $docs = $record->activitydocs;
+                
+                            if ($docs->isEmpty()) {
+                                return '<div style="text-align: center; padding: 32px; color: #6b7280; background-color: #f9fafb; border-radius: 8px; border: 2px dashed #d1d5db;">
+                                    <svg style="width: 48px; height: 48px; margin: 0 auto 16px; color: #9ca3af;" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <p style="margin: 0; font-size: 16px;">Belum ada dokumentasi yang diupload</p>
+                                    <p style="margin: 4px 0 0; font-size: 14px; color: #9ca3af;">Gunakan tombol "Tambah Dokumentasi" untuk menambah file</p>
+                                </div>';
+                            }
+                
+                            $formattedDocs = '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 12px;">';
+                
+                            foreach ($docs as $doc) {
+                                $fileName = basename($doc->documentation);
+                                $shortFileName = strlen($fileName) > 25 ? substr($fileName, 0, 22) . '...' : $fileName;
+                                $url = asset('storage/' . $doc->documentation);
+                                $date = $doc->created_at->format('d M Y, H:i');
+                                $extension = strtolower(pathinfo($doc->documentation, PATHINFO_EXTENSION));
+                
+                                $fileType = '';
+                                $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                
+                                if ($isImage) {
+                                    $preview = '<div style="width: 100%; height: 200px; overflow: hidden; border-radius: 8px 8px 0 0; background-color: #f9fafb; position: relative;">
+                                        <img src="' . $url . '" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>';
+                                    $fileType = 'Gambar';
+                                } else {
+                                    $preview = '<div style="width: 100%; height: 200px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 8px 8px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; position: relative;">
+                                        <svg style="width: 64px; height: 64px; margin-bottom: 8px;" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        <span style="font-size: 12px; font-weight: 500; opacity: 0.9;">DOC</span>
+                                    </div>';
+                                    $fileType = 'Dokumen';
+                                }
+                
+                                $formattedDocs .= '<div style="border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.06); transition: all 0.3s ease;" onmouseover="this.style.transform=\'translateY(-2px)\'; this.style.boxShadow=\'0 8px 25px rgba(0,0,0,0.12)\'" onmouseout="this.style.transform=\'translateY(0)\'; this.style.boxShadow=\'0 2px 4px rgba(0,0,0,0.06)\'">
+                                    ' . $preview . '
+                                    <div style="padding: 16px;">
+                                        <div style="margin-bottom: 12px;">
+                                            <a href="' . $url . '" target="_blank" style="color: #1f2937; font-weight: 600; font-size: 14px; line-height: 1.4; text-decoration: none; transition: color 0.2s ease;" onmouseover="this.style.color=\'#2563eb\'" onmouseout="this.style.color=\'#1f2937\'" title="' . $fileName . '">' . $shortFileName . '</a>
+                                            <div style="color: #6b7280; font-size: 12px; font-weight: 500; margin-top: 4px;">' . $fileType . '</div>
+                                        </div>
+                                        <div style="color: #6b7280; font-size: 11px; display: flex; align-items: center; padding-top: 12px; border-top: 1px solid #f3f4f6;">
+                                            <svg style="width: 12px; height: 12px; margin-right: 4px;" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            ' . $date . '
+                                        </div>
+                                    </div>
+                                </div>';
+                            }
+                
+                            $formattedDocs .= '</div>';
+                            return $formattedDocs;
+                        })
+                        ->html()
+                        ->columnSpanFull()
+                ])                
                     ->collapsible(),
 
                 Section::make('Catatan Kegiatan')
-                    ->schema([
-                        TextEntry::make('notes.note')
-                            ->prose()
-                            ->markdown()
-                            ->hiddenLabel()
-                            ->formatStateUsing(function ($state) {
-                                $notes = collect(explode(',', $state))
-                                    ->map(fn($note) => '<li>' . trim($note) . '</li>')
-                                    ->implode('');
-
-                                return "<ul class='list-disc list-inside pl-4'>" . $notes . "</ul>";
-                            })
-                            ->html(),
+                ->schema([
+                    TextEntry::make('notes.note')
+                        ->prose()
+                        ->markdown()
+                        ->hiddenLabel()
+                        ->formatStateUsing(function ($state) {
+                            $notes = collect(explode(',', $state))
+                                ->map(function($note) {
+                                    return "<div class='border border-gray-200 rounded-lg p-4 bg-white shadow-sm mb-3'>
+                                                <div class='text-gray-800 mb-2'>" . trim($note) . "</div>
+                                                <div class='text-gray-500 text-sm'>
+                                                    <span>Dibuat oleh: Admin</span>
+                                                    <span class='mx-2'>•</span>
+                                                    <span>" . now()->format('d F Y, H:i') . "</span>
+                                                </div>
+                                            </div>";
+                                })
+                                ->implode('');
+                            
+                            return $notes;
+                        })
+                        ->html()
+                        ->columnSpanFull(),                
                     ])
                     ->collapsible(),
             ]);

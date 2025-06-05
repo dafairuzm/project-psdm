@@ -31,7 +31,7 @@ class UserActivityResource extends Resource
 {
     protected static ?string $model = UserActivity::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-duplicate';
     protected static ?string $navigationGroup = 'Kegiatan';
 
     protected static ?string $navigationLabel = 'Kegiatan Pegawai';
@@ -43,12 +43,6 @@ class UserActivityResource extends Resource
     {
         return 2; // Angka lebih kecil = lebih atas di sidebar
     }
-
-    // public static function getTableQuery(): Builder
-    // {
-    //     return parent::getTableQuery()
-    //         ->with('activity.categories'); // <-- eager load relasi kategori
-    // }
 
     public static function form(Form $form): Form
     {

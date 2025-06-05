@@ -165,7 +165,7 @@ class ManageUserActivities extends ManageRelatedRecords
                             ->success()
                             ->body('Peserta berhasil ditambahkan dan daftar hadir otomatis dibuat.')
                             ->send();
-                    })            
+                    })           
             ])
             ->actions([
                 Tables\Actions\Action::make('manage_attendance')
@@ -300,10 +300,11 @@ class ManageUserActivities extends ManageRelatedRecords
                                 ->body($e->getMessage())
                                 ->send();
                         }
-                    }),
+                    })->visible(fn () => auth()->user()->can('create_attendance')),
                 Action::make('view')
                     ->label('Lihat')
-                    ->icon('heroicon-o-eye')
+                    ->icon('heroicon-s-eye')
+                    ->color('gray')
                     ->modalHeading(fn(UserActivity $record) => 'Daftar Kehadiran : ' . $record->user->name)
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Tutup')

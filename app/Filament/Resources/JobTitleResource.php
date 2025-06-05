@@ -6,10 +6,15 @@ use App\Filament\Resources\JobTitleResource\Pages;
 use App\Models\JobTitle;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
+use Filament\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Filament\Resources\JobTitleResource\RelationManagers\UsersRelationManager;
+use Filament\Pages\SubNavigationPosition;
 
 class JobTitleResource extends Resource
 {
@@ -22,6 +27,8 @@ class JobTitleResource extends Resource
     protected static ?string $pluralModelLabel = 'Jabatan';
     protected static ?string $navigationLabel = 'Jabatan';
     protected static ?int $navigationSort = 2;
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+
 
     public static function form(Form $form): Form
     {
@@ -36,6 +43,19 @@ class JobTitleResource extends Resource
                     ->maxLength(65535)
                     ->columnSpanFull()
                     ->label('Deskripsi'),
+            ]);
+    }
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Section::make([
+                    
+                    TextEntry::make('name')
+                    ->label('Jabatan'),
+                    TextEntry::make('description')
+                    ->label('Deskripsi'),
+                ])
             ]);
     }
 
@@ -68,10 +88,21 @@ class JobTitleResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                ->modalActions([
+                    Tables\Actions\Action::make('goToEdit')
+                        ->label('Edit')
+                        ->color('primary')
+                        ->icon('heroicon-o-pencil')
+                        ->url(fn($record) => static::getUrl('edit', ['record' => $record]))
+                        ->openUrlInNewTab(false),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make()
-        ]);
+            ])
+            ->recordUrl(null)
+            ->recordAction('view');
     }
 
     public static function getPages(): array
@@ -80,6 +111,7 @@ class JobTitleResource extends Resource
             'index' => Pages\ListJobTitles::route('/'),
             'create' => Pages\CreateJobTitle::route('/create'),
             'edit' => Pages\EditJobTitle::route('/{record}/edit'),
+            'view' => Pages\ViewJobTitle::route('/{record}'),
         ];
     }
     public static function getRelations(): array
@@ -87,5 +119,13 @@ class JobTitleResource extends Resource
     return [
         UsersRelationManager::class,
     ];
+    }
+
+    public static function getRecordSubNavigation(Page $page): array
+    {
+        return $page->generateNavigationItems([
+            Pages\ViewJobTitle::class,
+            Pages\EditJobTitle::class,
+        ]);
     }
 } 

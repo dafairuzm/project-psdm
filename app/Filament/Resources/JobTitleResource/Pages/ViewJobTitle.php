@@ -1,15 +1,18 @@
 <?php
 
-namespace App\Filament\Resources\ActivityResource\Pages;
+namespace App\Filament\Resources\JobTitleResource\Pages;
 
-use App\Filament\Resources\ActivityResource;
+use App\Filament\Resources\JobTitleResource;
 use Filament\Actions;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 
-class ViewActivity extends ViewRecord
+class ViewJobTitle extends ViewRecord
 {
-    protected static string $resource = ActivityResource::class;
+    protected static string $resource = JobTitleResource::class;
 
     protected static ?string $title = 'Lihat Detail';
     public function getTitle(): string | Htmlable
@@ -17,11 +20,12 @@ class ViewActivity extends ViewRecord
         /** @var \App\Models\Activity */
         $record = $this->getRecord();
 
-        return $record->title;
+        return $record->name;
     }
 
     protected function getActions(): array
     {
         return [];
     }
+
 }

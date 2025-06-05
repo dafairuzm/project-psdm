@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ActivityResource\Pages;
 
 use App\Filament\Resources\ActivityResource;
+use App\Models\Documentation;
 use Filament\Actions;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\FileUpload;
@@ -11,6 +12,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Form;
 use Filament\Resources\Pages\ManageRelatedRecords;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -20,6 +22,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Illuminate\Support\Facades\Storage;
 
 
 class ManageDocumentation extends ManageRelatedRecords
@@ -67,28 +70,34 @@ class ManageDocumentation extends ManageRelatedRecords
                 ImageColumn::make('documentation')
                     ->label('Gambar')
                     ->disk('public') // atau sesuai disk yang kamu pakai
-                    ->height('80px')// atur ukuran tinggi gambar
+                    ->height('100px')// atur ukuran tinggi gambar
                     ->width('auto')  // atau bisa juga 100%
                     ->extraImgAttributes(['style' => 'object-fit: cover; border-radius: 8px;']),
                 TextColumn::make('user.name')
-                    ->label('Created By')
+                    ->label('Dibuat oleh')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
-                    //->searchable()
+                    ->label('Dibuat pada')//->searchable()
                     ->sortable(),
             ]
         )
             ->headerActions([
-                \Filament\Tables\Actions\CreateAction::make(),
+                \Filament\Tables\Actions\CreateAction::make()
+                ->label('Upload Dokumentasi')
+                ->icon('heroicon-o-arrow-up'),
             ])
             ->actions([
-                //ViewAction::make(),
-                EditAction::make(),
+                ViewAction::make()
+                ->modalHeading('Preview'),
                 DeleteAction::make(),
+                Action::make('download')
+                    ->label('Download')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->url(fn ($record) => route('download-dokumentasi', ['id' => $record->id])),
             ])
-            ->groupedBulkActions([
+            ->BulkActions([
                 DeleteBulkAction::make(),
             ]);
 

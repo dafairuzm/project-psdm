@@ -8,6 +8,7 @@ use App\Models\Documentation;
 use App\Models\Note;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -81,15 +82,27 @@ class RiwayatKegiatanResource extends Resource
             ->schema([
                 // Form untuk dokumentasi dan catatan
                 Forms\Components\Section::make('Tambah Dokumentasi')
-                    ->schema([
-                        Forms\Components\FileUpload::make('documentation')
-                            ->label('File Dokumentasi')
-                            ->directory('documentations')
-                            ->acceptedFileTypes(['image/*', 'application/pdf'])
-                            ->multiple()
-                            ->columnSpanFull(),
-                    ])
-                    ->collapsible(),
+                ->schema([
+                    Forms\Components\FileUpload::make('documentation_files')
+                        ->label('File Dokumentasi')
+                        ->directory('documentations')
+                        ->acceptedFileTypes(['image/*', 'application/pdf'])
+                        ->multiple()
+                        ->columnSpanFull()
+                        ->afterStateUpdated(function ($state, $record, $set) {
+                            // Simpan ke model Documentation ketika file diupload
+                            if ($state && $record && $record->activity_id) {
+                                Documentation::create([
+                                    'activity_id' => $record->activity_id,
+                                    'file_path' => $state,
+                                    'uploaded_by' => Auth::id(),
+                                ]);
+                            }
+                        })
+                        ->dehydrated(false), // Tidak disimpan ke UserActivity
+                ])
+                ->collapsible()
+                ->visible(fn ($record) => $record && $record->activity_id),
                     
                 Forms\Components\Section::make('Tambah Catatan')
                     ->schema([
@@ -244,6 +257,11 @@ class RiwayatKegiatanResource extends Resource
                                 'documentation' => $file,
                                 'user_id' => Auth::id(),
                             ]);
+                            Notification::make()
+                        ->title('Upload Berhasil')
+                        ->body('Dokumentasi berhasil diupload!')
+                        ->success()
+                        ->send();
                         }
                     })
                     ->successNotificationTitle('Dokumentasi berhasil ditambahkan')

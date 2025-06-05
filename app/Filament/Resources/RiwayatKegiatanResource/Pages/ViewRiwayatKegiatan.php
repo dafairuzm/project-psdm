@@ -311,12 +311,27 @@ class ViewRiwayatKegiatan extends ViewRecord
                                     ->where('user_id', Auth::id())
                                     ->orderBy('created_at', 'desc')
                                     ->get();
-
+                    
+                                if ($notes->isEmpty()) {
+                                    return "<div class='border border-gray-200 rounded-lg p-4 bg-gray-50'>
+                                                <p class='text-gray-500 italic'>Tidak ada catatan tersedia</p>
+                                            </div>";
+                                }
+                    
                                 $formattedNotes = $notes->map(function ($note) {
                                     $date = $note->created_at->format('d F Y, H:i');
-                                    return $note->note . ' <span class="text-gray-500 text-sm">(' . $date . ')</span>';
-                                })->join('<br><br>');
-
+                                    $userName = $note->user->name ?? 'Unknown User'; // Ambil nama user
+                                    
+                                    return "<div class='border border-gray-200 rounded-lg p-4 bg-white shadow-sm mb-3'>
+                                                <div class='text-gray-800 mb-2'>" . $note->note . "</div>
+                                                <div class='text-gray-500 text-sm'>
+                                                    <span>Dibuat oleh: " . $userName . "</span>
+                                                    <span class='mx-2'>•</span>
+                                                    <span>" . $date . "</span>
+                                                </div>
+                                            </div>";
+                                })->join('');
+                    
                                 return $formattedNotes;
                             })
                             ->html()
