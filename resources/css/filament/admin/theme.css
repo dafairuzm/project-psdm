@@ -1,3 +1,451 @@
-@import '../../../../vendor/filament/filament/resources/css/theme.css';
+/* Import Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@config 'tailwind.config.js';
+/* ========================================
+   GLOBAL RESET
+======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    font-size: 16px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ========================================
+   CSS VARIABLES
+======================================== */
+:root {
+    --primary: #10B981;
+    --primary-hover: #059669;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --red-500: #ef4444;
+    
+    /* Responsive spacing */
+    --form-width: min(400px, 90vw);
+    --form-padding: clamp(2rem, 5vw, 3rem);
+    --spacing-sm: clamp(0.5rem, 1.5vw, 0.75rem);
+    --spacing-md: clamp(1rem, 3vw, 1.5rem);
+    --spacing-lg: clamp(1.5rem, 4vw, 2rem);
+    
+    /* Typography */
+    --font-xl: clamp(1.5rem, 4vw, 2rem);
+    --font-sm: clamp(0.75rem, 2vw, 0.875rem);
+    --font-base: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+/* ========================================
+   CSS VARIABLES
+======================================== */
+:root {
+    --primary: #10b981;
+    --primary-hover: #059669;
+    --gray-800: #1f2937;
+    --gray-700: #374151;
+    --gray-600: #4b5563;
+    --gray-500: #6b7280;
+    --gray-400: #9ca3af;
+    --gray-300: #d1d5db;
+    --red-500: #ef4444;
+    --font-xl: 1.5rem;
+    --font-base: 1rem;
+    --font-sm: 0.875rem;
+    --spacing-lg: 2rem;
+    --spacing-md: 1rem;
+    --spacing-sm: 0.5rem;
+    --form-width: 400px;
+    --form-padding: 2rem;
+}
+
+/* ========================================
+   MAIN CONTAINER
+======================================== */
+.fi-simple-main-ctn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-height: 100vh;
+    height: 100vh;
+    width: 100vw;
+    background: url('/storage/app/public/backgrounds/bg.png') no-repeat left top;
+    background-size: cover;
+    background-position: center;
+    background-attachment: scroll;
+    background-color: white;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+/* ========================================
+   LOGIN FORM CONTAINER
+======================================== */
+.fi-simple-main {
+    position: relative;
+    width: 400px;
+    max-width: 400px;
+    min-width: 400px;
+    padding: var(--form-padding);
+    /* background: white; */
+    /* backdrop-filter: blur(10px); */
+    /* border-radius: 12px; */
+    /* box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); */
+    border: none !important;
+    z-index: 10;
+    margin-right: 2rem;
+    
+    /* Center content vertically within the form */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ========================================
+   LOGO SECTION
+======================================== */
+.fi-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+    width:auto;
+    /* height:200px; */
+}
+
+.fi-logo img {
+    /* width: 10rem; */
+    height: 10rem;
+    margin-right: 0.75rem;
+    /* background: var(--primary); */
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+}
+
+/* .fi-logo::after {
+    content: "SIMAK PSDM";
+    font-size: var(--font-base);
+    font-weight: 600;
+    color: var(--gray-800);
+    letter-spacing: 0.025em;
+} */
+
+
+.fi-simple-header{
+    spacing:var(--spacing-lg);
+}
+
+/* ========================================
+   HEADING SECTION
+======================================== */
+.fi-simple-header h1 {
+    font-size: 0 !important;
+    position: relative;
+    width: 100%;
+    margin-top: var(--spacing-lg);
+    margin-bottom: 0;
+    /* Hilangkan line-height dan spacing yang tidak perlu */
+    line-height:0;
+    height: auto;
+    overflow: hidden;
+}
+
+.fi-simple-header h1::before {
+    content: "Selamat Datang";
+    display: flex;
+    justify-content: center;
+    font-size: var(--font-xl);
+    font-weight: 700;
+    color: var(--gray-800);
+    text-align: center;
+    /* margin-top: var(--spacing-sm); /
+    / margin-bottom: var(--spacing-sm); /
+    letter-spacing: -0.025em;
+    / Reset line-height untuk konten custom */
+    line-height: 1.5;
+}
+
+.fi-simple-header h1::after {
+    content: "Masukkan Email dan password anda untuk mengakses akun";
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    color: var(--gray-500);
+    font-size: var(--font-sm);
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+/* ========================================
+   FORM STYLING
+======================================== */
+.fi-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: var(--spacing-md);
+}
+
+/* Labels */
+.fi-field-wrapper-label, .fi-input-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    font-size: var(--font-sm);
+}
+
+.fi-field-wrapper-label::after {
+    content: " *";
+    color: var(--red-500);
+}
+
+/* Input Fields */
+/* .fi-input, .fi-select, .fi-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem;
+    font-size: var(--font-base);
+    background: white;
+    transition: all 0.2s ease;
+    color: var(--gray-700);
+} */
+
+.fi-input:focus, .fi-select:focus, .fi-textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    outline: none;
+}
+
+.fi-input::placeholder {
+    color: var(--gray-400);
+    font-weight: 400;
+}
+
+/* Checkbox */
+.fi-checkbox {
+    display: flex;
+    align-items: center;
+    margin: var(--spacing-sm) 0;
+}
+
+.fi-checkbox-input {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+    accent-color: var(--primary);
+    border-radius: 0.25rem;
+}
+
+.fi-checkbox-label {
+    font-size: var(--font-sm);
+    color: var(--gray-600);
+    font-weight: 400;
+}
+
+/* ========================================
+   BUTTON STYLING
+======================================== */
+.fi-simple-page .fi-btn {
+    width: 100%;
+    padding: 0.75rem;
+    color: white;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    background: var(--primary);
+    border: none;
+    transition: all 0.2s ease;
+    font-size: var(--font-base);
+    margin-top: var(--spacing-sm);
+    cursor: pointer;
+}
+
+.fi-simple-page .fi-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 0.25rem 0.75rem rgba(16, 185, 129, 0.3);
+}
+
+.fi-simple-page .fi-btn:active {
+    transform: translateY(0);
+}
+
+.fi-simple-page .fi-btn:disabled {
+    background: var(--gray-300);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ========================================
+   LINKS
+======================================== */
+.fi-simple-page a {
+    color: var(--primary);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: var(--font-sm);
+    text-align: center;
+    display: block;
+    margin-top: var(--spacing-sm);
+}
+
+.fi-simple-page a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+/* ========================================
+   ERROR MESSAGES
+======================================== */
+.fi-field-wrapper-error-message {
+    color: var(--red-500);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+    .fi-simple-main {
+        position: relative;
+        right: auto;
+        top: auto;
+        transform: none;
+        width: 100%;
+        max-width: 500px;
+        margin: 2rem auto;
+        border-radius: 1rem;
+        box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1);
+    }
+    
+    .fi-simple-main-ctn {
+        justify-content: center;
+        padding: 1rem;
+    }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+    :root {
+        --form-padding: clamp(1.5rem, 4vw, 2rem);
+        --form-width: min(350px, 95vw);
+    }
+    
+    .fi-simple-main {
+        margin: 1rem auto;
+        width: var(--form-width);
+    }
+    
+    .fi-simple-main-ctn {
+        background-attachment: scroll;
+    }
+}
+
+/* Small Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+    :root {
+        --form-padding: 1rem;
+        --form-width: min(320px, 95vw);
+    }
+    
+    .fi-simple-main {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(5px);
+    }
+}
+
+/* ========================================
+   ZOOM HANDLING
+======================================== */
+@media (min-resolution: 120dpi) {
+    html { font-size: 15px; }
+}
+
+@media (min-resolution: 144dpi) {
+    html { font-size: 14px; }
+}
+
+@media (min-resolution: 192dpi) {
+    html { font-size: 12px; }
+}
+
+/* ========================================
+   ANIMATIONS
+======================================== */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(2rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(0.5rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fi-simple-main {
+    animation: slideInRight 0.6s ease-out;
+}
+
+.fi-form {
+    animation: fadeIn 0.5s ease-out 0.2s both;
+}
+
+.fi-logo {
+    animation: fadeIn 0.5s ease-out 0.1s both;
+}
+
+/* ========================================
+   ACCESSIBILITY
+======================================== */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .fi-input, .fi-select, .fi-textarea {
+        border-width: 2px;
+    }
+    
+    .fi-simple-page .fi-btn {
+        border: 2px solid var(--primary-hover);
+    }
+}
