@@ -6,9 +6,11 @@ use App\Filament\Resources\UserResource;
 use App\Imports\UserImport;
 use App\Imports\UsersImport;
 use Filament\Actions;
+use Filament\Forms\Components\Placeholder;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
+use Illuminate\Support\HtmlString;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ListUsers extends ListRecords
@@ -23,6 +25,17 @@ class ListUsers extends ListRecords
                 ->icon('heroicon-o-arrow-up-tray')
                 ->color('gray')
                 ->form([
+                    Placeholder::make('template_info')
+                    ->disableLabel()
+                    ->content(new HtmlString('
+                        <div class="p-3 bg-gray-50 border border-gray-200 rounded-md">
+                            <a href="' . asset('storage/templates/Data Pegawai Example.xlsx') . '" 
+                            download="Data Pegawai Example .xlsx"
+                            class="text-emerald-600 hover:text-grey-800 underline text-md font-medium">
+                                Download Template
+                            </a>
+                        </div>
+                    ')),
                     FileUpload::make('file')
                         ->label('File Excel')
                         ->acceptedFileTypes([

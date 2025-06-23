@@ -10,10 +10,12 @@ use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Actions\ImportAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Pages\ListRecords\Tab;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\HtmlString;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ListUserActivities extends ListRecords
@@ -28,6 +30,18 @@ class ListUserActivities extends ListRecords
                 ->icon('heroicon-o-arrow-up-tray')
                 ->color('gray')
                 ->form([
+                    Placeholder::make('template_info')
+                        ->disableLabel()
+                        ->content(new HtmlString('
+                            <div class="p-3 bg-gray-50 border border-gray-200 rounded-md">
+                                <a href="' . asset('storage/templates/Data Kegiatan Example .xlsx') . '" 
+                                download="Data Kegiatan Example .xlsx"
+                                class="text-emerald-600 hover:text-grey-800 underline text-md font-medium">
+                                    Download Template
+                                </a>
+                            </div>
+    ')),
+
                     FileUpload::make('file')
                         ->label('File Excel')
                         ->acceptedFileTypes([
@@ -101,8 +115,8 @@ class ListUserActivities extends ListRecords
                 ->requiresConfirmation()
                 ->modalHeading('Import Data Kegiatan Pegawai')
                 ->modalDescription('
-                Pastikan format file Excel sesuai dengan template.
-                File harus memiliki header di baris pertama. Data yang sudah ada akan dilewati')
+            Pastikan format file Excel sesuai dengan template.
+            File harus memiliki header di baris pertama. Data yang sudah ada akan dilewati')
                 ->modalSubmitActionLabel('Import'),
         ];
     }
