@@ -32,7 +32,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Emerald,
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
-            ->brandLogo(asset('storage/images/logo1.svg'))
+            ->brandLogo(asset('storage/images/logo.png'))
             ->brandName('SIMAK PSDM')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
