@@ -2,7 +2,3 @@
 
 @config 'tailwind.config.js';
 
-.equal-height-widgets .fi-wi-chart {
-    min-height: 400px;
-    height: 400px;
-}

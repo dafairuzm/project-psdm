@@ -35,7 +35,6 @@ class LatestActivities   extends BaseWidget
                 TextColumn::make('title')
                     ->label('Nama Kegiatan')
                     ->searchable()
-                    ->sortable()
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
@@ -80,8 +79,7 @@ class LatestActivities   extends BaseWidget
                     ->formatStateUsing(function ($state) {
                         if (!$state) return null;
                         return \Carbon\Carbon::parse($state)->locale('id')->isoFormat('D MMMM Y');
-                    })
-                    ->sortable(),
+                    }),
                     
                 TextColumn::make('finish_date')
                     ->label('Tanggal Selesai')
@@ -105,7 +103,6 @@ class LatestActivities   extends BaseWidget
                 TextColumn::make('created_at')
                     ->label('Created')
                     ->since()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([

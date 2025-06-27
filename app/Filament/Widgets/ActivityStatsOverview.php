@@ -19,7 +19,7 @@ class ActivityStatsOverview extends BaseWidget
         // Mendapatkan filter dari dashboard
         $startDate = ! is_null($this->filters['startDate'] ?? null) ?
             Carbon::parse($this->filters['startDate']) :
-            now()->subMonths(6);
+            now()->subMonths(12);
             
         $endDate = ! is_null($this->filters['endDate'] ?? null) ?
             Carbon::parse($this->filters['endDate']) :
@@ -44,7 +44,9 @@ class ActivityStatsOverview extends BaseWidget
                         $weekEnd = $endDate->copy();
                     }
                     
-                    $query = Activity::whereBetween('created_at', [$weekStart, $weekEnd]);
+                    // Kegiatan berdasarkan start_date saja
+                    $query = Activity::whereBetween('start_date', [$weekStart, $weekEnd]);
+                    
                     if ($type) {
                         $query->where('type', $type);
                     }
@@ -64,7 +66,9 @@ class ActivityStatsOverview extends BaseWidget
                         $monthEnd = $endDate->copy();
                     }
                     
-                    $query = Activity::whereBetween('created_at', [$monthStart, $monthEnd]);
+                    // Kegiatan berdasarkan start_date saja
+                    $query = Activity::whereBetween('start_date', [$monthStart, $monthEnd]);
+                    
                     if ($type) {
                         $query->where('type', $type);
                     }
@@ -80,41 +84,43 @@ class ActivityStatsOverview extends BaseWidget
         $exhouseChart = $getChartData('exhouse');
         $inhouseChart = $getChartData('inhouse');
 
-        // Menghitung total untuk range yang dipilih
-        $totalActivities = Activity::whereBetween('created_at', [$startDate, $endDate])
-            ->count();
+        // Menentukan apakah menggunakan periode mingguan atau bulanan
+        $isWeeklyPeriod = $periods <= 2;
+
+        // Menghitung total untuk range yang dipilih berdasarkan start_date saja
+        $totalActivities = Activity::whereBetween('start_date', [$startDate, $endDate])->count();
             
         $totalExhouse = Activity::where('type', 'exhouse')
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereBetween('start_date', [$startDate, $endDate])
             ->count();
             
         $totalInhouse = Activity::where('type', 'inhouse')
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereBetween('start_date', [$startDate, $endDate])
             ->count();
 
         return [
             Stat::make('Semua Kegiatan', $totalActivities)
                 ->chart($allActivitiesChart)
-                ->description($this->getChartDescription($allActivitiesChart))
+                ->description($this->getChartDescription($allActivitiesChart, $isWeeklyPeriod))
                 ->descriptionIcon($this->getChartTrendIcon($allActivitiesChart))
                 ->color($this->getChartTrendColor($allActivitiesChart)),
                 
             Stat::make('Kegiatan Exhouse', $totalExhouse)
                 ->chart($exhouseChart)
-                ->description($this->getChartDescription($exhouseChart))
+                ->description($this->getChartDescription($exhouseChart, $isWeeklyPeriod))
                 ->descriptionIcon($this->getChartTrendIcon($exhouseChart))
                 ->color($this->getChartTrendColor($exhouseChart)),
                 
             Stat::make('Kegiatan Inhouse', $totalInhouse)
                 ->chart($inhouseChart)
-                ->description($this->getChartDescription($inhouseChart))
+                ->description($this->getChartDescription($inhouseChart, $isWeeklyPeriod))
                 ->descriptionIcon($this->getChartTrendIcon($inhouseChart))
                 ->color($this->getChartTrendColor($inhouseChart)),
         ];
     }
 
     // Fungsi helper untuk menghitung persentase perubahan
-    private function getChartDescription(array $chartData): string
+    private function getChartDescription(array $chartData, bool $isWeeklyPeriod = false): string
     {
         if (count($chartData) < 2) {
             return 'Data tidak cukup';
@@ -132,13 +138,14 @@ class ActivityStatsOverview extends BaseWidget
         }
         
         $percentChange = round((($current - $previous) / $previous) * 100, 1);
+        $periodText = $isWeeklyPeriod ? 'minggu lalu' : 'bulan lalu';
         
         if ($percentChange > 0) {
-            return "{$percentChange}% peningkatan";
+            return "{$percentChange}% peningkatan dari {$periodText}";
         } elseif ($percentChange < 0) {
-            return abs($percentChange) . "% penurunan";
+            return abs($percentChange) . "% penurunan dari {$periodText}";
         } else {
-            return "Tidak ada perubahan";
+            return "Tidak ada perubahan dari {$periodText}";
         }
     }
 
