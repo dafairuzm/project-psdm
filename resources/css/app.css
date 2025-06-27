@@ -1,11 +1,342 @@
-@import 'tailwindcss';
+/* Import Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/* Import custom theme for login page */
+@import './filament/admin/theme.css';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* Global Medical Theme Variables untuk halaman selain login */
+:root {
+    --medical-primary: #10b981;
+    --medical-primary-light: #34d399;
+    --medical-primary-dark: #059669;
+    --medical-secondary: #6b7280;
+    --medical-background: #f9fafb;
+    --medical-surface: #ffffff;
+    --medical-border: #e2e8f0;
+}
+
+/* Base Global Styles - hanya untuk halaman selain login */
+body:not(.login-page) {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--medical-background);
+    color: #374151;
+    line-height: 1.6;
+}
+
+/* Utility Classes untuk Medical Theme - hanya untuk halaman selain login */
+.medical-gradient {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.medical-shadow {
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1), 0 2px 4px -1px rgba(16, 185, 129, 0.06);
+}
+
+.medical-shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -2px rgba(16, 185, 129, 0.05);
+}
+
+.medical-border {
+    border-color: #10b981;
+}
+
+.medical-focus:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Medical Card Component - hanya untuk halaman selain login */
+.medical-card {
+    background: var(--medical-surface);
+    border-radius: 12px;
+    border: 1px solid var(--medical-border);
+    padding: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.medical-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.medical-card-header {
+    background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+    margin: -20px -20px 20px -20px;
+    padding: 15px 20px;
+    border-radius: 12px 12px 0 0;
+    border-bottom: 1px solid var(--medical-border);
+}
+
+/* Medical Button Styles - hanya untuk halaman selain login */
+.medical-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+}
+
+.medical-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.medical-btn-primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.medical-btn-primary:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+}
+
+.medical-btn-secondary {
+    background: var(--medical-surface);
+    color: var(--medical-secondary);
+    border: 1px solid var(--medical-border);
+}
+
+.medical-btn-secondary:hover {
+    background: #f8fafc;
+    border-color: var(--medical-primary);
+    color: var(--medical-primary);
+}
+
+.medical-btn-outline {
+    background: transparent;
+    color: var(--medical-primary);
+    border: 1.5px solid var(--medical-primary);
+}
+
+.medical-btn-outline:hover {
+    background: var(--medical-primary);
+    color: white;
+}
+
+/* Medical Form Elements - hanya untuk halaman selain login */
+.medical-form-group {
+    margin-bottom: 20px;
+}
+
+.medical-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.medical-input, .medical-select, .medical-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--medical-border);
+    border-radius: 8px;
+    background: var(--medical-surface);
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.medical-input:focus, .medical-select:focus, .medical-textarea:focus {
+    outline: none;
+    border-color: var(--medical-primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Medical Table - hanya untuk halaman selain login */
+.medical-table {
+    width: 100%;
+    background: var(--medical-surface);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.medical-table th {
+    background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 2px solid var(--medical-border);
+}
+
+.medical-table td {
+    padding: 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.medical-table tbody tr:hover {
+    background-color: rgba(16, 185, 129, 0.02);
+}
+
+/* Medical Status Badges - hanya untuk halaman selain login */
+.medical-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.medical-badge-success {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.medical-badge-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+}
+
+.medical-badge-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.medical-badge-info {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+}
+
+/* Medical Icons - hanya untuk halaman selain login */
+.medical-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--medical-primary);
+    filter: drop-shadow(0 1px 2px rgba(16, 185, 129, 0.2));
+}
+
+.medical-icon-lg {
+    width: 24px;
+    height: 24px;
+}
+
+.medical-icon-sm {
+    width: 16px;
+    height: 16px;
+}
+
+/* Medical Loading Spinner - hanya untuk halaman selain login */
+.medical-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid var(--medical-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Medical Alert - hanya untuk halaman selain login */
+.medical-alert {
+    padding: 16px;
+    border-radius: 8px;
+    border-left: 4px solid;
+    margin-bottom: 16px;
+}
+
+.medical-alert-success {
+    background: rgba(16, 185, 129, 0.05);
+    border-left-color: var(--medical-primary);
+    color: #059669;
+}
+
+.medical-alert-warning {
+    background: rgba(245, 158, 11, 0.05);
+    border-left-color: #f59e0b;
+    color: #d97706;
+}
+
+.medical-alert-danger {
+    background: rgba(239, 68, 68, 0.05);
+    border-left-color: #ef4444;
+    color: #dc2626;
+}
+
+.medical-alert-info {
+    background: rgba(59, 130, 246, 0.05);
+    border-left-color: #3b82f6;
+    color: #2563eb;
+}
+
+/* Responsive Classes untuk halaman selain login */
+@media (max-width: 768px) {
+    .medical-card {
+        padding: 16px;
+    }
+    
+    .medical-btn {
+        padding: 8px 16px;
+        font-size: 0.875rem;
+    }
+    
+    .medical-table {
+        font-size: 0.875rem;
+    }
+    
+    .medical-table th,
+    .medical-table td {
+        padding: 12px;
+    }
+}
+
+/* Utility Animations untuk halaman selain login */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
