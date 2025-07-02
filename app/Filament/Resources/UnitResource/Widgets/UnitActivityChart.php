@@ -1,23 +1,24 @@
 <?php
 
-namespace App\Filament\Resources\JobTitleResource\Widgets;
+namespace App\Filament\Resources\UnitResource\Widgets;
 
 use Filament\Widgets\ChartWidget;
-use App\Models\JobTitle;
+use App\Models\Unit;
 use App\Models\UserActivity;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class JobTitleActivityChart extends ChartWidget
+class UnitActivityChart extends ChartWidget
 {
-    protected static ?string $heading = 'Total Kegiatan per Jabatan';
+    protected static ?string $heading = 'Kegiatan per Unit';
 
     // protected int | string | array $columnSpan = 'full';
     protected int | string | array $columnSpan = [
         'default' => 'full',
         'md' => 1,
+        'xl' => 1,
     ];
-    protected static ?string $height = '400px';
+    protected static ?string $height = '450px';
     
     protected static ?int $sort = 2;
     
@@ -29,17 +30,17 @@ class JobTitleActivityChart extends ChartWidget
     protected function getFilters(): ?array
     {
         return [
-            'all' => 'All Time',
-            'today' => 'Today',
-            'yesterday' => 'Yesterday',
-            'this_week' => 'This Week',
-            'last_week' => 'Last Week',
-            'this_month' => 'This Month',
-            'last_month' => 'Last Month',
-            'this_quarter' => 'This Quarter',
-            'this_year' => 'This Year',
-            'last_30_days' => 'Last 30 Days',
-            'last_90_days' => 'Last 90 Days',
+            'all' => 'Semua Waktu',
+            'today' => 'Hari ini',
+            'yesterday' => 'Kemarin',
+            'this_week' => 'Minggu Ini',
+            'last_week' => 'Minggu Terakhir',
+            'this_month' => 'Bulan Ini',
+            'last_month' => 'Bulan Terakhir',
+            'this_quarter' => 'Kuarter Ini',
+            'this_year' => 'Tahun Ini',
+            'last_30_days' => '30 Hari Terakhir',
+            'last_90_days' => '90 Hari Terakhir',
         ];
     }
     
@@ -48,8 +49,8 @@ class JobTitleActivityChart extends ChartWidget
         $activeFilter = $this->filter ?? 'all';
         
         // Base query untuk menghitung activity per job title
-        $query = JobTitle::select('job_titles.name')
-            ->leftJoin('users', 'users.job_title_id', '=', 'job_titles.id')
+        $query = Unit::select('units.name')
+            ->leftJoin('users', 'users.unit_id', '=', 'units.id')
             ->leftJoin('user_activity', 'user_activity.user_id', '=', 'users.id')
             ->leftJoin('activities', 'activities.id', '=', 'user_activity.activity_id');
         
@@ -62,8 +63,8 @@ class JobTitleActivityChart extends ChartWidget
         }
         
         // Group by job title dan hitung jumlah activity
-        $data = $query->groupBy('job_titles.id', 'job_titles.name')
-            ->select('job_titles.name', DB::raw('COUNT(user_activity.id) as activity_count'))
+        $data = $query->groupBy('units.id', 'units.name')
+            ->select('units.name', DB::raw('COUNT(user_activity.id) as activity_count'))
             ->having('activity_count', '>', 0)
             ->orderBy('activity_count', 'desc')
             ->get();
@@ -95,10 +96,17 @@ class JobTitleActivityChart extends ChartWidget
         // Calculate total for percentage
         $total = $data->sum('activity_count');
         
-        // Create labels with percentage and count
+        // Create labels dengan auto truncation untuk nama panjang
         $labelsWithData = $data->map(function ($item) use ($total) {
             $percentage = $total > 0 ? round(($item->activity_count / $total) * 100, 1) : 0;
-            return "{$item->name} ({$percentage}% - {$item->activity_count})";
+            
+            // Truncate nama unit jika terlalu panjang untuk layout 2 kolom
+            $unitName = $item->name;
+            if (strlen($unitName) > 15) {
+                $unitName = substr($unitName, 0, 12) . '...';
+            }
+            
+            return "{$unitName} ({$percentage}%)";
         })->toArray();
         
         return [
@@ -114,15 +122,15 @@ class JobTitleActivityChart extends ChartWidget
         ];
     }
     
-    public function getDescription(): ?string
-    {
-        if (!$this->chartData || $this->chartData->isEmpty()) {
-            return 'No data available for the selected period.';
-        }
+    // public function getDescription(): ?string
+    // {
+    //     if (!$this->chartData || $this->chartData->isEmpty()) {
+    //         return 'No data available for the selected period.';
+    //     }
         
-        $total = $this->chartData->sum('activity_count');
-        return "Total Kegiatan: {$total}";
-    }
+    //     $total = $this->chartData->sum('activity_count');
+    //     return "Total Kegiatan: {$total}";
+    // }
     
     protected function getDateRange(string $filter): ?array
     {
@@ -160,72 +168,81 @@ class JobTitleActivityChart extends ChartWidget
     protected function getOptions(): array
     {
         return [
-        'maintainAspectRatio' => true,
-        'aspectRatio' => 1, // Sesuaikan ratio yang diinginkan
-        'responsive' => true,
+            'maintainAspectRatio' => false,
+            'responsive' => true,
             'plugins' => [
                 'legend' => [
                     'display' => true,
-                    'position' => 'right',
+                    'position' => 'bottom',
                     'labels' => [
                         'usePointStyle' => true,
-                        'padding' => 15,
+                        'padding' => 12,
+                        'boxWidth' => 10,
+                        'boxHeight' => 10,
                         'font' => [
                             'size' => 12,
-                        ]
+                        ],
+                        'textAlign' => 'left',
+                        'maxWidth' => 120,
                     ]
                 ],
                 'tooltip' => [
                     'callbacks' => [
+                        'title' => 'function(context) {
+                            // Show full unit name in tooltip
+                            const originalData = ' . json_encode($this->chartData?->mapWithKeys(function($item) { 
+                                return [$item->name => $item->activity_count]; 
+                            })->toArray() ?? []) . ';
+                            
+                            const labelText = context[0].label;
+                            const shortName = labelText.split(" (")[0].replace("...", "");
+                            
+                            // Find full name from original data
+                            for (const [fullName, count] of Object.entries(originalData)) {
+                                if (fullName.toLowerCase().includes(shortName.toLowerCase()) || 
+                                    shortName.toLowerCase().includes(fullName.toLowerCase().substring(0, 10))) {
+                                    return fullName;
+                                }
+                            }
+                            return shortName;
+                        }',
                         'label' => 'function(context) {
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((context.parsed * 100) / total).toFixed(1);
-                            const originalLabel = context.label.split(" (")[0];
-                            return originalLabel + ": " + context.parsed + " activities (" + percentage + "%)";
+                            return context.parsed + " kegiatan (" + percentage + "%)";
                         }'
                     ]
                 ],
-                // Plugin untuk data labels pada slice
+                // Plugin untuk data labels pada slice - disable untuk layout kecil
                 'datalabels' => [
                     'display' => 'function(context) {
-                        // Hanya tampilkan label jika persentase >= 5% untuk menghindari tumpang tindih
+                        // Hanya tampilkan untuk slice besar (>= 10%) di layout 2 kolom
                         const total = context.dataset.data.reduce((a, b) => a + b, 0);
                         const percentage = (context.parsed / total) * 100;
-                        return percentage >= 5;
+                        return percentage >= 10;
                     }',
                     'color' => 'white',
                     'font' => [
                         'weight' => 'bold',
-                        'size' => 11
+                        'size' => 9
                     ],
                     'formatter' => 'function(value, context) {
                         const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                        const percentage = ((value / total) * 100).toFixed(1);
-                        return percentage + "%\\n(" + value + ")";
+                        const percentage = ((value / total) * 100).toFixed(0);
+                        return percentage + "%";
                     }',
                     'textAlign' => 'center',
-                    'anchor' => 'center', // Posisi di tengah slice
+                    'anchor' => 'center',
                     'align' => 'center',
-                    'offset' => 0,
-                    'borderRadius' => 4,
-                    'backgroundColor' => 'function(context) {
-                        // Background semi-transparan untuk readability
-                        return "rgba(0, 0, 0, 0.7)";
-                    }',
-                    'borderColor' => 'white',
-                    'borderWidth' => 1,
-                    'padding' => 4
                 ]
             ],
-            'responsive' => true,
-            'maintainAspectRatio' => false,
-            'cutout' => '60%',
+            'cutout' => '50%', // Kurangi cutout untuk lebih banyak space
             'layout' => [
                 'padding' => [
-                    'left' => 20,
-                    'right' => 20,
-                    'top' => 20,
-                    'bottom' => 20
+                    'left' => 10,
+                    'right' => 10,
+                    'top' => 10,
+                    'bottom' => 20 // Space untuk legend di bottom
                 ]
             ]
         ];

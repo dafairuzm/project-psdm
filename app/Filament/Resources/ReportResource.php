@@ -97,4 +97,10 @@ class ReportResource extends Resource
             'edit' => Pages\EditReport::route('/{record}/edit'),
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->orderBy('created_at', 'desc');
+    }
 }

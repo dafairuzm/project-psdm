@@ -106,10 +106,12 @@ class ActivityResource extends Resource
                     ]),
                 Tables\Columns\TextColumn::make('categories.name')
                     ->label('Kategori')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('speaker')
-                    ->label('Pembicara')
-                    ->searchable(),
+                    ->sortable()
+                    ->badge()
+                    ->separator(',')
+                    ->limit(30)
+                    ->color('gray')
+                    ->placeholder('not set'),
                 Tables\Columns\TextColumn::make('organizer')
                     ->label('Penyelenggara')
                     ->searchable()
@@ -117,7 +119,8 @@ class ActivityResource extends Resource
                         'style' => 'width: 300px; max-width: 300px;'
                     ])
                     ->limit(60)
-                    ->wrap(),
+                    ->wrap()
+                    ->placeholder('not set'),
                 Tables\Columns\TextColumn::make('location')
                     ->label('Lokasi')
                     ->searchable()
@@ -125,7 +128,8 @@ class ActivityResource extends Resource
                         'style' => 'width: 300px; max-width: 300px;'
                     ])
                     ->limit(60)
-                    ->wrap(),
+                    ->wrap()
+                    ->placeholder('belum di set'),
                 Tables\Columns\TextColumn::make('start_date')
                     ->label('Tanggal Mulai')
                     ->date('d F Y')
@@ -135,9 +139,11 @@ class ActivityResource extends Resource
                     ->date('d F Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('duration')
-                    ->label('Durasi (Jam pelajaran)')
+                    ->label('Durasi')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->suffix(' JPL')
+                    ->placeholder('not set'),
             ])
             ->filters([
                 Tables\Filters\Filter::make('date_range')
@@ -192,15 +198,20 @@ class ActivityResource extends Resource
                                             ->badge()
                                             ->color(fn(string $state): string => $state === 'inhouse' ? 'success' : 'info'),
                                         TextEntry::make('categories.name')
-                                            ->label('Kategori'),
+                                            ->label('Kategori')
+                                            ->badge()
+                                            ->separator(',')
+                                            ->limit(30)
+                                            ->color('gray')
+                                            ->placeholder('not set'),
                                         TextEntry::make('organizer')
-                                            ->label('Penyelenggara'),
+                                            ->label('Penyelenggara')
+                                            ->placeholder('not set'),
                                     ]),
                                     Components\Group::make([
-                                        TextEntry::make('speaker')
-                                            ->label('Pembicara'),
                                         TextEntry::make('location')
-                                            ->label('Lokasi'),
+                                            ->label('Lokasi')
+                                            ->placeholder('not set'),
                                         TextEntry::make('start_date')
                                             ->label('Tanggal Mulai')
                                             ->date('d F Y'),
@@ -209,7 +220,8 @@ class ActivityResource extends Resource
                                             ->date('d F Y'),
                                         TextEntry::make('duration')
                                             ->label('Durasi')
-                                            ->suffix('Jam Pelajaran'),
+                                            ->suffix('Jam Pelajaran')
+                                            ->placeholder('not set'),
                                     ]),
                                 ]),
                         ])->from('md'),
@@ -343,4 +355,11 @@ class ActivityResource extends Resource
             // UserActivityRelationManager::class,
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->orderBy('created_at', 'desc');
+    }
+
 }

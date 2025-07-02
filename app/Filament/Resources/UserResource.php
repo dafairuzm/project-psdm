@@ -69,14 +69,14 @@ class UserResource extends Resource
                     ->label('Golongan')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Select::make('job_title_id')
+                Forms\Components\Select::make('unit_id')
                     ->required()
-                    ->relationship('jobTitle', 'name')
-                    ->label('Jabatan')
+                    ->relationship('Unit', 'name')
+                    ->label('Unit')
                     ->searchable()
                     ->preload(),
-                Forms\Components\TextInput::make('title_complete')
-                    ->label('Jabatan Lengkap')
+                Forms\Components\TextInput::make('job_title')
+                    ->label('Jabatan')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -105,8 +105,8 @@ class UserResource extends Resource
                                             }),
                                     ]),
                                     Group::make([
-                                        TextEntry::make('jobTitle.name')->label('Jabatan'),
-                                        TextEntry::make('title_complete')->label('Jabatan Lengkap'),
+                                        TextEntry::make('Unit.name')->label('Unit'),
+                                        TextEntry::make('job_title')->label('Jabatan'),
                                     ]),
                                 ]),
                         ])->from('md'),
@@ -139,13 +139,13 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('employee_class')
                     ->label('Golongan')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('jobTitle.name')
-                    ->label('Jabatan')
+                Tables\Columns\TextColumn::make('Unit.name')
+                    ->label('Unit')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
-                Tables\Columns\TextColumn::make('title_complete')
-                    ->label('Jabatan Lengkap')
+                Tables\Columns\TextColumn::make('job_title')
+                    ->label('Jabatan')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')
@@ -176,8 +176,7 @@ class UserResource extends Resource
                 Tables\Actions\DeleteBulkAction::make()
             ])
             ->recordUrl(null)
-            ->recordAction('view')
-        ;
+            ->recordAction('view');
     }
 
     public static function getRelations(): array

@@ -33,12 +33,13 @@ class ViewRiwayatKegiatan extends ViewRecord
                 ->color('success')
                 ->form([
                     Forms\Components\FileUpload::make('documentation')
-                        ->label('File Dokumentasi')
-                        ->directory('documentations')
-                        ->acceptedFileTypes(['image/*', 'application/pdf'])
-                        ->multiple()
-                        ->required()
-                        ->helperText('Upload file gambar atau PDF sebagai dokumentasi kegiatan'),
+                            ->label('File Dokumentasi')
+                            ->directory('documentations')
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
+                            ->maxSize(15360) // 15MB dalam KB
+                            ->multiple()
+                            ->required()
+                            ->helperText('Unggah file gambar dengan format JPG, JPEG, atau PNG. Maksimal ukuran file 15 MB.'),
                 ])
                 ->action(function (array $data): void {
                     foreach ($data['documentation'] as $file) {
@@ -93,18 +94,16 @@ class ViewRiwayatKegiatan extends ViewRecord
                                 TextEntry::make('activity.type')
                                     ->label('Jenis Kegiatan')
                                     ->badge()
-                                    ->color(fn(string $state): string => match ($state) {
-                                        'seminar' => 'success',
-                                        'workshop' => 'info',
-                                        'pelatihan' => 'warning',
-                                        'rapat' => 'gray',
-                                        default => 'primary',
-                                    }),
+                                    ->colors([
+                                        'primary' => 'inhouse',
+                                        'warning' => 'exhouse',
+                                    ]),
 
                                 TextEntry::make('activity.categories.name')
                                     ->label('Kategori')
                                     ->badge()
-                                    ->separator(', '),
+                                    ->separator(', ')
+                                    ->placeholder('not set'),
 
                                 TextEntry::make('activity.speaker')
                                     ->label('Pemateri/Narasumber')
@@ -128,7 +127,7 @@ class ViewRiwayatKegiatan extends ViewRecord
 
                                 TextEntry::make('activity.duration')
                                     ->label('Durasi')
-                                    ->suffix(' hari'),
+                                    ->suffix(' JPL'),
                             ])
                     ]),
 

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Activity;
+use App\Models\ActivityCategory;
 use App\Models\JobTitle;
 
 class UserActivitiesImport implements ToCollection, WithHeadingRow, WithValidation
@@ -44,7 +45,7 @@ class UserActivitiesImport implements ToCollection, WithHeadingRow, WithValidati
                 $user = $this->findOrCreateUser($row);
                 Log::info("User found/created: " . $user->name . " (ID: " . $user->id . ")");
 
-                // Cari atau buat activity
+                // Cari atau buat activity beserta kategorinya
                 $activity = $this->findOrCreateActivity($row);
                 Log::info("Activity found/created: " . $activity->title . " (ID: " . $activity->id . ")");
 
@@ -75,69 +76,68 @@ class UserActivitiesImport implements ToCollection, WithHeadingRow, WithValidati
     }
 
     protected function findOrCreateUser($row)
-{
-    $nama = trim($row['nama']);
-    $titleComplete = trim($row['jabatan']);
+    {
+        $nama = trim($row['nama']);
+        $jobTitle = trim($row['jabatan']);
 
-    // Cek user berdasarkan nama dan title_complete
-    $user = User::where('name', $nama)
-        ->where('title_complete', $titleComplete)
-        ->first();
+        // Cek user berdasarkan nama dan job_title
+        $user = User::where('name', $nama)
+            ->where('job_title', $jobTitle)
+            ->first();
 
-    if (!$user) {
-        // Ambil nilai pangkat/golongan dari kolom 'pangkatgol' atau beri default '-'
-        $employeeClass = !empty($row['pangkatgol']) ? trim($row['pangkatgol']) : '-';
+        if (!$user) {
+            // Ambil nilai pangkat/golongan dari kolom 'pangkatgol' atau beri default '-'
+            $employeeClass = !empty($row['pangkatgol']) ? trim($row['pangkatgol']) : '-';
 
-        try {
-            // Mulai database transaction
-            \DB::beginTransaction();
+            try {
+                // Mulai database transaction
+                \DB::beginTransaction();
 
-            // Buat user baru
-            $user = User::create([
-                'name' => $nama,
-                'email' => $this->generateEmail($nama),
-                'password' => bcrypt('password123'), // Default password
-                // Hapus 'role' => 'user' karena sekarang pakai Spatie Permission
-                'nip' => null, // Biarkan kosong
-                'employee_class' => $employeeClass,
-                'title_complete' => $titleComplete,
-                'job_title_id' => null, // Biarkan kosong sesuai permintaan
-            ]);
-
-            // Assign default role "Pegawai" menggunakan Spatie Permission
-            $pegawaiRole = \Spatie\Permission\Models\Role::where('name', 'Pegawai')->first();
-            
-            if ($pegawaiRole) {
-                $user->assignRole('Pegawai');
-            } else {
-                // Log warning jika role tidak ada, tapi tetap lanjutkan
-                \Log::warning("Role 'Pegawai' tidak ditemukan saat membuat user", [
-                    'user_name' => $nama,
-                    'user_email' => $user->email
+                // Buat user baru
+                $user = User::create([
+                    'name' => $nama,
+                    'email' => $this->generateEmail($nama),
+                    'password' => bcrypt('password123'), // Default password
+                    'nip' => null, // Biarkan kosong
+                    'employee_class' => $employeeClass,
+                    'job_title' => $jobTitle,
+                    'unit_id' => null, // Biarkan kosong sesuai permintaan
                 ]);
+
+                // Assign default role "Pegawai" menggunakan Spatie Permission
+                $pegawaiRole = \Spatie\Permission\Models\Role::where('name', 'Pegawai')->first();
+                
+                if ($pegawaiRole) {
+                    $user->assignRole('Pegawai');
+                } else {
+                    // Log warning jika role tidak ada, tapi tetap lanjutkan
+                    \Log::warning("Role 'Pegawai' tidak ditemukan saat membuat user", [
+                        'user_name' => $nama,
+                        'user_email' => $user->email
+                    ]);
+                }
+
+                // Commit transaction
+                \DB::commit();
+
+            } catch (\Exception $e) {
+                // Rollback jika ada error
+                \DB::rollback();
+                
+                // Log error
+                \Log::error("Gagal membuat user baru", [
+                    'user_name' => $nama,
+                    'job_title' => $jobTitle,
+                    'error' => $e->getMessage()
+                ]);
+                
+                // Re-throw exception agar proses import bisa handle error
+                throw $e;
             }
-
-            // Commit transaction
-            \DB::commit();
-
-        } catch (\Exception $e) {
-            // Rollback jika ada error
-            \DB::rollback();
-            
-            // Log error
-            \Log::error("Gagal membuat user baru", [
-                'user_name' => $nama,
-                'title_complete' => $titleComplete,
-                'error' => $e->getMessage()
-            ]);
-            
-            // Re-throw exception agar proses import bisa handle error
-            throw $e;
         }
-    }
 
-    return $user;
-}
+        return $user;
+    }
 
     protected function findOrCreateActivity($row)
     {
@@ -161,17 +161,64 @@ class UserActivitiesImport implements ToCollection, WithHeadingRow, WithValidati
             // Buat activity baru
             $activity = Activity::create([
                 'title' => $title,
-                'type' => $row['jenis'], // Berikan nilai default
-                'speaker' => null, // Kosong karena tidak ada di Excel
+                'type' => $row['jenis'] ?? null,
                 'organizer' => $row['penyelenggara'] ?? null,
                 'location' => $row['tempat'] ?? null,
                 'start_date' => $startDate,
                 'finish_date' => $finishDate,
                 'duration' => $lamaJam // Menggunakan lama_jam dari Excel untuk kolom duration
             ]);
+
+            Log::info("Activity created with ID: " . $activity->id);
         }
 
+        // Handle kategori kegiatan
+        $this->attachCategoryToActivity($activity, $row);
+
         return $activity;
+    }
+
+    protected function attachCategoryToActivity($activity, $row)
+    {
+        // Ambil nama kategori dari kolom Excel (setelah type/jenis)
+        $categoryName = isset($row['kategori']) ? trim($row['kategori']) : null;
+
+        if (!empty($categoryName)) {
+            try {
+                // Cari atau buat kategori
+                $category = ActivityCategory::firstOrCreate(
+                    ['name' => $categoryName],
+                    [
+                        'name' => $categoryName,
+                        'description' => null, // atau bisa ditambahkan kolom description di Excel jika diperlukan
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]
+                );
+
+                Log::info("Category found/created: " . $category->name . " (ID: " . $category->id . ")");
+
+                // Attach kategori ke activity jika belum ada
+                if (!$activity->categories()->where('activity_category_id', $category->id)->exists()) {
+                    $activity->categories()->attach($category->id);
+                    Log::info("Category attached to activity successfully");
+                } else {
+                    Log::info("Category already attached to this activity");
+                }
+
+            } catch (\Exception $e) {
+                Log::error("Error processing category for activity", [
+                    'activity_id' => $activity->id,
+                    'category_name' => $categoryName,
+                    'error' => $e->getMessage()
+                ]);
+                
+                // Log error tapi jangan stop proses import
+                $this->errors[] = "Warning: Gagal memproses kategori '$categoryName' untuk activity '{$activity->title}': " . $e->getMessage();
+            }
+        } else {
+            Log::info("No category specified for activity: " . $activity->title);
+        }
     }
 
     protected function generateEmail($name)
@@ -192,8 +239,6 @@ class UserActivitiesImport implements ToCollection, WithHeadingRow, WithValidati
 
         return $email;
     }
-
-
 
     protected function parseDate($dateString)
     {
@@ -227,6 +272,7 @@ class UserActivitiesImport implements ToCollection, WithHeadingRow, WithValidati
             'judul_pelatihan' => 'required|string',
             // Tambahkan validasi untuk kolom yang required di database
             'pangkatgol' => 'nullable|string', // Sesuaikan dengan nama kolom di Excel
+            'kategori' => 'nullable|string', // Validasi untuk kategori kegiatan
         ];
     }
 

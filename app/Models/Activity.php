@@ -14,7 +14,6 @@ class Activity extends Model
         'title',
         'type',
         'category_id',
-        'speaker',
         'organizer',
         'location',
         'start_date',

@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            JobTitleSeeder::class,
+            UnitSeeder::class,
             UserSeeder::class,
             ActivityCategorySeeder::class,
             ActivitySeeder::class,

@@ -69,10 +69,12 @@ class UserActivityResource extends Resource
                     ->label('Nama Pegawai')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.employee_class')
-                    ->label('Pangkat/Gol'),
-                Tables\Columns\TextColumn::make('user.title_complete')
+                    ->label('Pangkat/Gol')
+                    ->placeholder('not set'),
+                Tables\Columns\TextColumn::make('user.job_title')
                     ->label('Jabatan')
-                    ->searchable(),
+                    ->searchable()
+                    ->placeholder('not set'),
                 Tables\Columns\BadgeColumn::make('activity.type')
                     ->label('Tipe')
                     ->searchable()
@@ -91,14 +93,19 @@ class UserActivityResource extends Resource
                 Tables\Columns\TextColumn::make('activity.categories.name')
                     ->label('Kategori')
                     ->searchable()
-                    ->formatStateUsing(fn($state, $record) => $record->activity?->categories->pluck('name')->join(', ')),
+                    ->badge()
+                    ->separator(',')
+                    ->limit(30)
+                    ->color('gray')
+                    ->placeholder('not set'),
                 Tables\Columns\TextColumn::make('activity.organizer')
                     ->label('Penyelenggara')
                     ->extraAttributes([
                         'style' => 'width: 300px; max-width: 300px;'
                     ])
                     ->limit(60)
-                    ->wrap(),
+                    ->wrap()
+                    ->placeholder('not set'),
                 Tables\Columns\TextColumn::make('activity.location')
                     ->label('Lokasi')
                     ->searchable()
@@ -106,6 +113,7 @@ class UserActivityResource extends Resource
                         'style' => 'width: 300px; max-width: 300px;'
                     ])
                     ->limit(60)
+                    ->placeholder('not set')
                     ->wrap(),
             ])
             ->filters([
@@ -193,10 +201,12 @@ class UserActivityResource extends Resource
                                         TextEntry::make('user.name')
                                             ->label('Nama Pegawai'),
                                         TextEntry::make('user.nip')
-                                            ->label('NIP'),
+                                            ->label('NIP')
+                                            ->placeholder('not set'),
                                         TextEntry::make('user.employee_class')
-                                            ->label('Pangkat/Gol'),
-                                        TextEntry::make('user.title_complete')
+                                            ->label('Pangkat/Gol')
+                                            ->placeholder('not set'),
+                                        TextEntry::make('user.job_title')
                                             ->label('Jabatan'),
                                     ]),
                                     Group::make([
@@ -210,11 +220,18 @@ class UserActivityResource extends Resource
                                         TextEntry::make('activity.title')
                                             ->label('Kegiatan'),
                                         TextEntry::make('activity.categories.name')
-                                            ->label('Kategori Kegiatan'),
+                                            ->label('Kategori Kegiatan')
+                                            ->badge()
+                                            ->separator(',')
+                                            ->limit(30)
+                                            ->color('gray')
+                                            ->placeholder('not set'),
                                         TextEntry::make('activity.organizer')
-                                            ->label('Penyelenggara'),
+                                            ->label('Penyelenggara')
+                                            ->placeholder('not set'),
                                         TextEntry::make('activity.location')
-                                            ->label('Lokasi'),
+                                            ->label('Lokasi')
+                                            ->placeholder('not set'),
                                         TextEntry::make('activity.start_date')
                                             ->label('Tanggal Mulai')
                                             ->date('d F Y'),
@@ -223,7 +240,8 @@ class UserActivityResource extends Resource
                                             ->date('d F Y'),
                                         TextEntry::make('activity.duration')
                                             ->label('Durasi')
-                                            ->suffix('Jam Pelajaran'),
+                                            ->suffix(' Jam Pelajaran')
+                                            ->placeholder('not set'),
                                     ]),
                                 ]),
                         ])->from('md'),
@@ -247,6 +265,12 @@ class UserActivityResource extends Resource
             // 'edit' => Pages\EditUserActivity::route('/{record}/edit'),
             // 'view' => Pages\ViewUserActivity::route('/{record}/view'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->orderBy('created_at', 'desc');
     }
     
 }

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->enum('type', ['exhouse', 'inhouse']);
-            $table->string('speaker')->nullable();
             $table->string('organizer')->nullable();
             $table->string('location')->nullable();
             $table->dateTime('start_date');

@@ -86,9 +86,11 @@ class RiwayatKegiatanResource extends Resource
                     Forms\Components\FileUpload::make('documentation_files')
                         ->label('File Dokumentasi')
                         ->directory('documentations')
-                        ->acceptedFileTypes(['image/*', 'application/pdf'])
+                        ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
+                        ->maxSize(15360) // 15MB dalam KB
                         ->multiple()
                         ->columnSpanFull()
+                        ->helperText('Unggah file gambar dengan format JPG, JPEG, atau PNG. Maksimal ukuran file 15 MB.')
                         ->afterStateUpdated(function ($state, $record, $set) {
                             // Simpan ke model Documentation ketika file diupload
                             if ($state && $record && $record->activity_id) {
@@ -124,29 +126,33 @@ class RiwayatKegiatanResource extends Resource
                     ->label('Judul Kegiatan')
                     ->searchable()
                     ->sortable()
-                    ->wrap(),
+                    ->wrap()
+                    ->extraAttributes([
+                        'style' => 'width: 200px; max-width: 200px;'
+                    ]),
                     
                 TextColumn::make('activity.type')
                     ->label('Jenis')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'seminar' => 'success',
-                        'workshop' => 'info',
-                        'pelatihan' => 'warning',
-                        'rapat' => 'gray',
-                        default => 'primary',
-                    }),
+                    ->colors([
+                        'primary' => 'inhouse',
+                        'warning' => 'exhouse',
+                    ]),
                     
                 TextColumn::make('activity.categories.name')
                     ->label('Kategori')
                     ->badge()
                     ->separator(', ')
+                    ->placeholder('not set')
                     ->wrap(),
                     
                 TextColumn::make('activity.speaker')
                     ->label('Pemateri')
                     ->searchable()
                     ->wrap()
+                    ->extraAttributes([
+                        'style' => 'width: 100px; max-width: 100px;'
+                    ])
                     ->limit(30),
                     
                 TextColumn::make('activity.organizer')
@@ -159,6 +165,9 @@ class RiwayatKegiatanResource extends Resource
                     ->label('Lokasi')
                     ->searchable()
                     ->wrap()
+                    ->extraAttributes([
+                        'style' => 'width: 200px; max-width: 200px;'
+                    ])
                     ->limit(30),
                     
                 TextColumn::make('activity.start_date')
@@ -173,7 +182,7 @@ class RiwayatKegiatanResource extends Resource
                     
                 TextColumn::make('activity.duration')
                     ->label('Durasi')
-                    ->suffix(' hari')
+                    ->suffix(' JPL')
                     ->alignCenter(),
                     
                 TextColumn::make('attendances_count')
@@ -245,10 +254,11 @@ class RiwayatKegiatanResource extends Resource
                         Forms\Components\FileUpload::make('documentation')
                             ->label('File Dokumentasi')
                             ->directory('documentations')
-                            ->acceptedFileTypes(['image/*', 'application/pdf'])
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
+                            ->maxSize(15360) // 15MB dalam KB
                             ->multiple()
                             ->required()
-                            ->helperText('Upload file gambar atau PDF sebagai dokumentasi kegiatan'),
+                            ->helperText('Unggah file gambar dengan format JPG, JPEG, atau PNG. Maksimal ukuran file 15 MB.'),
                     ])
                     ->action(function (UserActivity $record, array $data): void {
                         foreach ($data['documentation'] as $file) {

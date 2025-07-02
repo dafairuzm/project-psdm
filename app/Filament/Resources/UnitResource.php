@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\JobTitleResource\Pages;
-use App\Models\JobTitle;
+use App\Filament\Resources\UnitResource\Pages;
+use App\Models\Unit;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
@@ -13,19 +13,19 @@ use Filament\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Filament\Resources\JobTitleResource\RelationManagers\UsersRelationManager;
+use App\Filament\Resources\UnitResource\RelationManagers\UsersRelationManager;
 use Filament\Pages\SubNavigationPosition;
 
-class JobTitleResource extends Resource
+class UnitResource extends Resource
 {
-    protected static ?string $model = JobTitle::class;
+    protected static ?string $model = Unit::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
 
     protected static ?string $navigationGroup = 'Pengguna';
-    protected static ?string $modelLabel = 'Jabatan';
-    protected static ?string $pluralModelLabel = 'Jabatan';
-    protected static ?string $navigationLabel = 'Jabatan';
+    protected static ?string $modelLabel = 'Unit Kerja';
+    protected static ?string $pluralModelLabel = 'Unit Kerja';
+    protected static ?string $navigationLabel = 'Unit Kerja';
     protected static ?int $navigationSort = 2;
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
@@ -37,7 +37,7 @@ class JobTitleResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255)
-                    ->label('Nama Jabatan')
+                    ->label('Nama Unit Kerja')
                     ->unique(ignoreRecord: true),
                 Forms\Components\Textarea::make('description')
                     ->maxLength(65535)
@@ -52,7 +52,7 @@ class JobTitleResource extends Resource
                 Section::make([
                     
                     TextEntry::make('name')
-                    ->label('Jabatan'),
+                    ->label('Unit Kerja'),
                     TextEntry::make('description')
                     ->label('Deskripsi'),
                 ])
@@ -65,7 +65,7 @@ class JobTitleResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->label('Nama Jabatan'),
+                    ->label('Nama Unit'),
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()
                     ->label('Deskripsi')
@@ -108,10 +108,10 @@ class JobTitleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListJobTitles::route('/'),
-            'create' => Pages\CreateJobTitle::route('/create'),
-            'edit' => Pages\EditJobTitle::route('/{record}/edit'),
-            'view' => Pages\ViewJobTitle::route('/{record}'),
+            'index' => Pages\ListUnit::route('/'),
+            'create' => Pages\CreateUnit::route('/create'),
+            'edit' => Pages\EditUnit::route('/{record}/edit'),
+            'view' => Pages\ViewUnit::route('/{record}'),
         ];
     }
     public static function getRelations(): array
@@ -124,8 +124,8 @@ class JobTitleResource extends Resource
     public static function getRecordSubNavigation(Page $page): array
     {
         return $page->generateNavigationItems([
-            Pages\ViewJobTitle::class,
-            Pages\EditJobTitle::class,
+            Pages\ViewUnit::class,
+            Pages\EditUnit::class,
         ]);
     }
 } 

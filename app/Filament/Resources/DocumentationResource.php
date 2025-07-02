@@ -54,11 +54,14 @@ class DocumentationResource extends Resource
                 FileUpload::make('documentation')
                 ->label('Dokumentasi')
                 ->image()
+                ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
+                ->maxSize(15360) // 15 MB dalam KB
                 ->directory('documentations')
                 ->disk('public')
                 ->preserveFilenames()
                 ->visibility('public')
                 ->required()
+                ->helperText('Unggah file gambar dengan format JPG, JPEG, atau PNG. Maksimal ukuran file 15 MB.')
                 ->columnSpanFull(),
 
             ]);
@@ -184,5 +187,10 @@ class DocumentationResource extends Resource
             'create' => Pages\CreateDocumentation::route('/create'),
             // 'edit' => Pages\EditDocumentation::route('/{record}/edit'),
         ];
+    }
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->orderBy('created_at', 'desc');
     }
 }

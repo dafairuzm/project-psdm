@@ -1,20 +1,20 @@
 <?php
 
-namespace App\Filament\Resources\JobTitleResource\Pages;
+namespace App\Filament\Resources\UnitResource\Pages;
 
-use App\Filament\Resources\JobTitleResource;
+use App\Filament\Resources\UnitResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListJobTitles extends ListRecords
+class ListUnit extends ListRecords
 {
-    protected static string $resource = JobTitleResource::class;
+    protected static string $resource = UnitResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()
-            ->label('Tambah Jabatan')
+            ->label('Tambah Unit Kerja')
             ->icon('heroicon-o-plus'),
         ];
     }

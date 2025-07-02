@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\JobTitleResource\RelationManagers;
+namespace App\Filament\Resources\UnitResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -39,7 +39,7 @@ class UsersRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('employee_class')
                 ->label('Pangkat/Gol')
                 ->searchable(),
-                Tables\Columns\TextColumn::make('title_complete')
+                Tables\Columns\TextColumn::make('job_title')
                 ->label('Jabatan')
                 ->searchable(),
             ])

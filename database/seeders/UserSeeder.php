@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\JobTitle;
+use App\Models\Unit;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -18,8 +18,8 @@ class UserSeeder extends Seeder
             'password' => Hash::make('admin123'),
             'nip' => '123456789',
             'employee_class' => 'IV/a',
-            'title_complete' => 'Kepala Bagian SDM',
-            'job_title_id' => JobTitle::firstOrCreate(['name' => 'Manajemen'])->id,
+            'job_title' => 'Kepala Bagian SDM',
+            'unit_id' => Unit::firstOrCreate(['name' => 'Manajemen'])->id,
         ]);
 
         // Dokter
@@ -29,8 +29,8 @@ class UserSeeder extends Seeder
             'password' => Hash::make('dokter123'),
             'nip' => '987654321',
             'employee_class' => 'III/d',
-            'title_complete' => 'Dokter Spesialis Penyakit Dalam',
-            'job_title_id' => JobTitle::firstOrCreate(['name' => 'Dokter'])->id,
+            'job_title' => 'Dokter Spesialis Penyakit Dalam',
+            'unit_id' => Unit::firstOrCreate(['name' => 'Dokter'])->id,
         ]);
         User::create([
             'name' => 'Daffa',
@@ -38,8 +38,8 @@ class UserSeeder extends Seeder
             'password' => Hash::make('daffa123'),
             'nip' => '2312412',
             'employee_class' => 'III/d',
-            'title_complete' => 'Dokter Penyakit',
-            'job_title_id' => 2,
+            'job_title' => 'Dokter Penyakit',
+            'unit_id' => 2,
         ]);
         User::create([
             'name' => 'Rani',
@@ -47,8 +47,8 @@ class UserSeeder extends Seeder
             'password' => Hash::make('rani123'),
             'nip' => '673334345',
             'employee_class' => 'III/d',
-            'title_complete' => 'Dokter Gigi',
-            'job_title_id' => 3,
+            'job_title' => 'Dokter Gigi',
+            'unit_id' => 3,
         ]);
     }
 } 

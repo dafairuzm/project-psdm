@@ -118,4 +118,9 @@ class NoteResource extends Resource
             // 'edit' => Pages\EditNote::route('/{record}/edit'),
         ];
     }
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->orderBy('created_at', 'desc');
+    }
 }

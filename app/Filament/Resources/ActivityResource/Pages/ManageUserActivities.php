@@ -83,7 +83,7 @@ class ManageUserActivities extends ManageRelatedRecords
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('user.nip')->label('NIP'),
-                TextColumn::make('user.title_complete')->label('Jabatan'),
+                TextColumn::make('user.job_title')->label('Jabatan'),
                 TextColumn::make('attendance_summary')
                     ->label('Status Kehadiran')
                     ->getStateUsing(function ($record) {
@@ -115,7 +115,7 @@ class ManageUserActivities extends ManageRelatedRecords
                             ->afterStateUpdated(function ($state, callable $set) {
                                 $user = \App\Models\User::find($state);
                                 $set('nip', $user?->nip);
-                                $set('jabatan', $user?->title_complete);
+                                $set('jabatan', $user?->job_title);
                             }),
             
                         TextInput::make('nip')

@@ -56,23 +56,21 @@ class LatestActivities   extends BaseWidget
                     ->label('Kategori')
                     ->badge()
                     ->separator(',')
-                    ->limit(3)
-                    ->color('gray'),
+                    ->limit(30)
+                    ->color('gray')
+                    ->placeholder('not set'),
                     
-                // TextColumn::make('speaker')
-                //     ->label('Speaker')
-                //     ->limit(30)
-                //     ->placeholder('No speaker'),
                     
                 TextColumn::make('organizer')
                     ->label('Penyelenggara')
                     ->limit(30)
-                    ->placeholder('No organizer'),
+                    ->placeholder('-')
+                    ->placeholder('not set'),
                     
                 TextColumn::make('location')
                     ->label('Lokasi')
                     ->limit(25)
-                    ->placeholder('No location'),
+                    ->placeholder('not set'),
                     
                 TextColumn::make('start_date')
                     ->label('Tanggal Mulai')
@@ -92,13 +90,13 @@ class LatestActivities   extends BaseWidget
                 TextColumn::make('duration')
                     ->label('Durasi')
                     ->suffix(' JPL')
-                    ->placeholder('Not set'),
+                    ->placeholder('-'),
                     
                 TextColumn::make('users_count')
                     ->label('Peserta')
                     ->counts('users')
                     ->badge()
-                    ->color('success'),
+                    ->color('grey'),
                     
                 TextColumn::make('created_at')
                     ->label('Created')
@@ -106,17 +104,6 @@ class LatestActivities   extends BaseWidget
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
-                    ->options([
-                        'workshop' => 'Workshop',
-                        'seminar' => 'Seminar',
-                        'conference' => 'Conference',
-                        'meeting' => 'Meeting',
-                    ]),
-                    
-                Tables\Filters\Filter::make('this_month')
-                    ->query(fn (Builder $query): Builder => $query->whereMonth('start_date', now()->month))
-                    ->label('This Month'),
             ])
             ->actions([
                 // Tables\Actions\Action::make('view')

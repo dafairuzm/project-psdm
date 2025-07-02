@@ -25,11 +25,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
         'nip',
         'employee_class',
-        'title_complete',
-        'job_title_id',
+        'job_title',
+        'unit_id',
     ];
 
     /**
@@ -52,9 +51,9 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function jobTitle(): BelongsTo
+    public function Unit(): BelongsTo
     {
-        return $this->belongsTo(JobTitle::class);
+        return $this->belongsTo(Unit::class);
     }
 
     public function activities()

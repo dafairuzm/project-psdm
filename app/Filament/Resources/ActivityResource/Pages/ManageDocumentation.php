@@ -51,11 +51,15 @@ class ManageDocumentation extends ManageRelatedRecords
             FileUpload::make('documentation')
                 ->label('Dokumentasi')
                 ->image()
+                ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
+                ->maxSize(15360) // 15 MB dalam KB
                 ->directory('documentations')
                 ->disk('public')
                 ->preserveFilenames()
                 ->visibility('public')
-                ->required(),
+                ->required()
+                ->helperText('Unggah file gambar dengan format JPG, JPEG, atau PNG. Maksimal ukuran file 15 MB.')
+                ->columnSpanFull(),
             Hidden::make('user_id')
                 ->default(fn() => auth()->id()),
             Hidden::make('activity_id')
@@ -85,17 +89,18 @@ class ManageDocumentation extends ManageRelatedRecords
         )
             ->headerActions([
                 \Filament\Tables\Actions\CreateAction::make()
-                ->label('Upload Dokumentasi')
-                ->icon('heroicon-o-arrow-up'),
+                    ->label('Upload Dokumentasi')
+                    ->icon('heroicon-o-arrow-up')
+                    ->modalHeading("Upload Dokumentasi"),
             ])
             ->actions([
                 ViewAction::make()
-                ->modalHeading('Preview'),
+                    ->modalHeading('Preview'),
                 DeleteAction::make(),
                 Action::make('download')
                     ->label('Download')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->url(fn ($record) => route('download-dokumentasi', ['id' => $record->id])),
+                    ->url(fn($record) => route('download-dokumentasi', ['id' => $record->id])),
             ])
             ->BulkActions([
                 DeleteBulkAction::make(),

@@ -2,30 +2,30 @@
 
 namespace Database\Seeders;
 
-use App\Models\JobTitle;
+use App\Models\Unit;
 use Illuminate\Database\Seeder;
 
-class JobTitleSeeder extends Seeder
+class UnitSeeder extends Seeder
 {
     public function run(): void
     {
-        JobTitle::create([
+        Unit::create([
             'name' => 'Dokter',
             'description' => 'Tenaga medis profesional yang bertanggung jawab dalam mendiagnosis dan menangani kondisi kesehatan pasien.',
         ]);
-        JobTitle::create([
+        Unit::create([
             'name' => 'Perawat',
             'description' => 'Tenaga kesehatan yang memberikan asuhan keperawatan dan perawatan pasien di berbagai unit layanan medis.',
         ]);
-        JobTitle::create([
+        Unit::create([
             'name' => 'Bidan',
             'description' => 'Tenaga kesehatan yang fokus pada pelayanan kehamilan, persalinan, nifas, dan kesehatan reproduksi wanita.',
         ]);
-        JobTitle::create([
+        Unit::create([
             'name' => 'Manajemen',
             'description' => 'Pegawai yang terlibat dalam pengelolaan, perencanaan, dan pengambilan keputusan di lingkungan rumah sakit.',
         ]);
-        JobTitle::create([
+        Unit::create([
             'name' => 'T.Kes Lain',
             'description' => 'Tenaga kesehatan lain di luar dokter, perawat, dan bidan seperti apoteker, analis laboratorium, fisioterapis, dll.',
         ]);

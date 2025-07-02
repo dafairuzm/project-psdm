@@ -3,7 +3,7 @@
 namespace App\Imports;
 
 use App\Models\User;
-use App\Models\JobTitle;
+use App\Models\Unit;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -32,14 +32,14 @@ class UsersImport implements ToCollection, WithHeadingRow
                 'email' => 'required|email|unique:users,email',
                 'nip' => 'nullable',
                 'golongan' => 'nullable|string',
-                'jabatan_lengkap' => 'nullable|string',
-                'jabatan' => 'required|string',
+                'jabatan' => 'nullable|string',
+                'unit' => 'required|string',
             ], [
                 'nama.required' => 'Kolom Nama wajib diisi',
                 'email.required' => 'Kolom Email wajib diisi',
                 'email.email' => 'Format email tidak valid',
                 'email.unique' => 'Email sudah terdaftar',
-                'jabatan.required' => 'Kolom Jabatan wajib diisi',
+                'unit.required' => 'Kolom Unit wajib diisi',
             ]);
 
             if ($validator->fails()) {
@@ -57,9 +57,9 @@ class UsersImport implements ToCollection, WithHeadingRow
             }
 
             // Cari atau buat job title berdasarkan nama
-            $jobTitle = JobTitle::firstOrCreate(
-                ['name' => $row['jabatan']],
-                ['description' => 'Auto created from import']
+            $unit = Unit::firstOrCreate(
+                ['name' => $row['unit']],
+                ['description' => 'deskripsi belum dibuat']
             );
 
             // Buat user baru
@@ -68,8 +68,8 @@ class UsersImport implements ToCollection, WithHeadingRow
                 'email' => $row['email'],
                 'nip' => $row['nip'],
                 'employee_class' => $row['golongan'] ?? null,
-                'title_complete' => $row['jabatan_lengkap'] ?? null,
-                'job_title_id' => $jobTitle->id,
+                'job_title' => $row['jabatan'] ?? null,
+                'unit_id' => $unit->id,
                 'password' => Hash::make($row['email']), // Password sama dengan email
                 // Hapus 'role' => 'user' karena sekarang pakai Spatie Permission
             ]);
