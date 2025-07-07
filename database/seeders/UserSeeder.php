@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Unit;
+use App\Models\Profession;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -17,9 +17,12 @@ class UserSeeder extends Seeder
             'email' => 'admin@admin.com',
             'password' => Hash::make('admin123'),
             'nip' => '123456789',
+            'gender' => 'laki-laki',
             'employee_class' => 'IV/a',
+            'employee_type' => 'ASN PNS',
             'job_title' => 'Kepala Bagian SDM',
-            'unit_id' => Unit::firstOrCreate(['name' => 'Manajemen'])->id,
+            'profession_id' => Profession::firstOrCreate(['name' => 'Manajemen'])->id,
+            'Unit_id' => 1,
         ]);
 
         // Dokter
@@ -28,27 +31,36 @@ class UserSeeder extends Seeder
             'email' => 'dokter@example.com',
             'password' => Hash::make('dokter123'),
             'nip' => '987654321',
-            'employee_class' => 'III/d',
+            'gender' => 'laki-laki',
+            'employee_class' => 'III/a',
+            'employee_type' => 'ASN PNS',
             'job_title' => 'Dokter Spesialis Penyakit Dalam',
-            'unit_id' => Unit::firstOrCreate(['name' => 'Dokter'])->id,
+            'profession_id' => Profession::firstOrCreate(['name' => 'Dokter'])->id,
+            'Unit_id' => 1,
         ]);
         User::create([
             'name' => 'Daffa',
             'email' => 'daffa@example.com',
             'password' => Hash::make('daffa123'),
             'nip' => '2312412',
-            'employee_class' => 'III/d',
+            'gender' => 'laki-laki',
+            'employee_class' => 'IV/a',
+            'employee_type' => 'ASN PNS',
             'job_title' => 'Dokter Penyakit',
-            'unit_id' => 2,
+            'profession_id' => 2,
+            'Unit_id' => 2,
         ]);
         User::create([
             'name' => 'Rani',
             'email' => 'rani@example.com',
             'password' => Hash::make('rani123'),
             'nip' => '673334345',
-            'employee_class' => 'III/d',
+            'gender' => 'laki-laki',
+            'employee_class' => 'IV/d',
+            'employee_type' => 'ASN PPPK',
             'job_title' => 'Dokter Gigi',
-            'unit_id' => 3,
+            'profession_id' => 3,
+            'Unit_id' => 3,
         ]);
     }
 } 

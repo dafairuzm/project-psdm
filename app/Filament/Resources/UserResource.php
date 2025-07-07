@@ -65,6 +65,18 @@ class UserResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
+                Forms\Components\Select::make('employee_type')
+                    ->label('Jenis Pegawai')
+                    ->required()
+                    ->options([
+                        'ASN PNS' => 'ASN PNS',
+                        'ASN PPK' => 'ASN PPK',
+                        'BLUD PHL' => 'BLUD PHL',
+                        'BLUD PTT' => 'BLUD PTT',
+                        'BLUD TETAP' => 'BLUD TETAP',
+                        'KSO' => 'KSO',
+                    ])
+                    ->required(),
                 Forms\Components\TextInput::make('employee_class')
                     ->label('Golongan')
                     ->required()
@@ -73,6 +85,12 @@ class UserResource extends Resource
                     ->required()
                     ->relationship('Unit', 'name')
                     ->label('Unit')
+                    ->searchable()
+                    ->preload(),
+                Forms\Components\Select::make('profession_id')
+                    ->required()
+                    ->relationship('profession', 'name')
+                    ->label('Profesi')
                     ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('job_title')
@@ -94,6 +112,8 @@ class UserResource extends Resource
                                     Group::make([
                                         TextEntry::make('name')->label('Nama Pegawai'),
                                         TextEntry::make('nip')->label('NIP'),
+                                        TextEntry::make('gender')->label('Jenis Kelamin'),
+                                        TextEntry::make('employee_type')->label('Jenis Pegawai'),
                                         TextEntry::make('employee_class')->label('Pangkat/Gol'),
                                         TextEntry::make('roles.name')
                                             ->label('Role')
@@ -105,7 +125,8 @@ class UserResource extends Resource
                                             }),
                                     ]),
                                     Group::make([
-                                        TextEntry::make('Unit.name')->label('Unit'),
+                                        TextEntry::make('unit.name')->label('Unit/Ruangan'),
+                                        TextEntry::make('profession.name')->label('Profesi'),
                                         TextEntry::make('job_title')->label('Jabatan'),
                                     ]),
                                 ]),
@@ -139,8 +160,13 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('employee_class')
                     ->label('Golongan')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('Unit.name')
-                    ->label('Unit')
+                Tables\Columns\TextColumn::make('unit.name')
+                    ->label('Unit/Ruangan')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+                Tables\Columns\TextColumn::make('profession.name')
+                    ->label('Profesi')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),

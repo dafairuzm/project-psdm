@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UnitResource\Pages;
-use App\Models\Unit;
+use App\Filament\Resources\ProfessionResource\Pages;
+use App\Models\Profession;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
@@ -13,19 +13,19 @@ use Filament\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Filament\Resources\UnitResource\RelationManagers\UsersRelationManager;
+use App\Filament\Resources\ProfessionResource\RelationManagers\UsersRelationManager;
 use Filament\Pages\SubNavigationPosition;
 
-class UnitResource extends Resource
+class ProfessionResource extends Resource
 {
-    protected static ?string $model = Unit::class;
+    protected static ?string $model = Profession::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
 
     protected static ?string $navigationGroup = 'Pengguna';
-    protected static ?string $modelLabel = 'Unit Kerja';
-    protected static ?string $pluralModelLabel = 'Unit Kerja';
-    protected static ?string $navigationLabel = 'Unit Kerja';
+    protected static ?string $modelLabel = 'Profesi';
+    protected static ?string $pluralModelLabel = 'Profesi';
+    protected static ?string $navigationLabel = 'Profesi';
     protected static ?int $navigationSort = 2;
     protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
@@ -37,7 +37,7 @@ class UnitResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255)
-                    ->label('Nama Unit Kerja')
+                    ->label('Nama Profesi')
                     ->unique(ignoreRecord: true),
                 Forms\Components\Textarea::make('description')
                     ->maxLength(65535)
@@ -52,7 +52,7 @@ class UnitResource extends Resource
                 Section::make([
                     
                     TextEntry::make('name')
-                    ->label('Unit Kerja'),
+                    ->label('Profesi'),
                     TextEntry::make('description')
                     ->label('Deskripsi'),
                 ])
@@ -65,7 +65,7 @@ class UnitResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->label('Nama Unit'),
+                    ->label('Nama Profesi'),
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()
                     ->label('Deskripsi')
@@ -108,10 +108,10 @@ class UnitResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUnit::route('/'),
-            'create' => Pages\CreateUnit::route('/create'),
-            'edit' => Pages\EditUnit::route('/{record}/edit'),
-            'view' => Pages\ViewUnit::route('/{record}'),
+            'index' => Pages\ListProfession::route('/'),
+            'create' => Pages\CreateProfession::route('/create'),
+            'edit' => Pages\EditProfession::route('/{record}/edit'),
+            'view' => Pages\ViewProfession::route('/{record}'),
         ];
     }
     public static function getRelations(): array
@@ -124,8 +124,8 @@ class UnitResource extends Resource
     public static function getRecordSubNavigation(Page $page): array
     {
         return $page->generateNavigationItems([
-            Pages\ViewUnit::class,
-            Pages\EditUnit::class,
+            Pages\ViewProfession::class,
+            Pages\EditProfession::class,
         ]);
     }
 } 

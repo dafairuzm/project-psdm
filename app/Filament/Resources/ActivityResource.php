@@ -61,9 +61,6 @@ class ActivityResource extends Resource
                     ->label('Penyelenggara')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('speaker')
-                    ->label('Pembicara')
-                    ->maxLength(255),
                 Forms\Components\TextInput::make('location')
                     ->label('Lokasi')
                     ->required()

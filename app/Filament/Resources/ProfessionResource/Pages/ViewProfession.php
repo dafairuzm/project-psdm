@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\UnitResource\Pages;
+namespace App\Filament\Resources\ProfessionResource\Pages;
 
 
-use App\Filament\Resources\UnitResource;
+use App\Filament\Resources\ProfessionResource;
 use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -11,9 +11,9 @@ use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Contracts\Support\Htmlable;
 
-class ViewUnit extends ViewRecord
+class ViewProfession extends ViewRecord
 {
-    protected static string $resource = UnitResource::class;
+    protected static string $resource = ProfessionResource::class;
 
     protected static ?string $title = 'Lihat Detail';
     public function getTitle(): string | Htmlable

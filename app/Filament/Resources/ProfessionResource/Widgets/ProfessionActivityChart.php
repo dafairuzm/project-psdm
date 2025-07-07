@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\UnitResource\Widgets;
+namespace App\Filament\Resources\ProfessionResource\Widgets;
 
 use Filament\Widgets\ChartWidget;
-use App\Models\Unit;
+use App\Models\Profession;
 use App\Models\UserActivity;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class UnitActivityChart extends ChartWidget
+class ProfessionActivityChart extends ChartWidget
 {
-    protected static ?string $heading = 'Kegiatan per Unit';
+    protected static ?string $heading = 'Kegiatan per Profesi';
 
     // protected int | string | array $columnSpan = 'full';
     protected int | string | array $columnSpan = [
@@ -37,7 +37,7 @@ class UnitActivityChart extends ChartWidget
             'last_week' => 'Minggu Terakhir',
             'this_month' => 'Bulan Ini',
             'last_month' => 'Bulan Terakhir',
-            'this_quarter' => 'Kuarter Ini',
+            'this_quarter' => 'Kuartal Ini',
             'this_year' => 'Tahun Ini',
             'last_30_days' => '30 Hari Terakhir',
             'last_90_days' => '90 Hari Terakhir',
@@ -49,8 +49,8 @@ class UnitActivityChart extends ChartWidget
         $activeFilter = $this->filter ?? 'all';
         
         // Base query untuk menghitung activity per job title
-        $query = Unit::select('units.name')
-            ->leftJoin('users', 'users.unit_id', '=', 'units.id')
+        $query = Profession::select('professions.name')
+            ->leftJoin('users', 'users.profession_id', '=', 'professions.id')
             ->leftJoin('user_activity', 'user_activity.user_id', '=', 'users.id')
             ->leftJoin('activities', 'activities.id', '=', 'user_activity.activity_id');
         
@@ -63,8 +63,8 @@ class UnitActivityChart extends ChartWidget
         }
         
         // Group by job title dan hitung jumlah activity
-        $data = $query->groupBy('units.id', 'units.name')
-            ->select('units.name', DB::raw('COUNT(user_activity.id) as activity_count'))
+        $data = $query->groupBy('professions.id', 'professions.name')
+            ->select('professions.name', DB::raw('COUNT(user_activity.id) as activity_count'))
             ->having('activity_count', '>', 0)
             ->orderBy('activity_count', 'desc')
             ->get();

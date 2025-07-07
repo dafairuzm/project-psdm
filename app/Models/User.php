@@ -28,7 +28,9 @@ class User extends Authenticatable
         'nip',
         'employee_class',
         'job_title',
+        'profession_id',
         'unit_id',
+        'room_id',
     ];
 
     /**
@@ -51,11 +53,14 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function Unit(): BelongsTo
+    public function profession(): BelongsTo
+    {
+        return $this->belongsTo(Profession::class);
+    }
+    public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
     }
-
     public function activities()
     {
         return $this->belongsToMany(Activity::class, 'user_activity');

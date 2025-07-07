@@ -3,7 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Resources\ActivityResource\Widgets\LatestActivities;
-use App\Filament\Resources\UnitResource\Widgets\UnitActivityChart;
+use App\Filament\Resources\ProfessionResource\Widgets\ProfessionActivityChart;
 use App\Filament\Resources\UserActivityResource\Widgets\UserActivityChart;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Actions\Action;
@@ -44,7 +44,7 @@ class Dashboard extends \Filament\Pages\Dashboard
         return [
             ...Filament::getWidgets(), // Ganti dengan nama widget stats kamu
             UserActivityChart::class,
-            UnitActivityChart::class,
+            ProfessionActivityChart::class,
             LatestActivities::class,
         ];
     }
