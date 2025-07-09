@@ -3,8 +3,9 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\RiwayatKegiatanResource\Pages;
-use App\Models\UserActivity; // Kembali menggunakan UserActivity
+use App\Models\UserActivity;
 use App\Models\Documentation;
+use App\Models\Certificate;
 use App\Models\Note;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -20,17 +21,18 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Pages\SubNavigationPosition;
+use Illuminate\Http\UploadedFile;
 
 class RiwayatKegiatanResource extends Resource
 {
-    protected static ?string $model = UserActivity::class; // Gunakan UserActivity
+    protected static ?string $model = UserActivity::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
-    
+
     protected static ?string $navigationLabel = 'Riwayat Kegiatan';
-    
+
     protected static ?string $modelLabel = 'Riwayat Kegiatan';
-    
+
     protected static ?string $pluralModelLabel = 'Riwayat Kegiatan';
 
     // Override permission checking untuk navigation
@@ -44,22 +46,22 @@ class RiwayatKegiatanResource extends Resource
     {
         return auth()->user()->can('view_any_riwayat::kegiatan');
     }
-    
+
     public static function canView($record): bool
     {
         return auth()->user()->can('view_riwayat::kegiatan');
     }
-    
+
     public static function canCreate(): bool
     {
         return auth()->user()->can('create_riwayat::kegiatan');
     }
-    
+
     public static function canEdit($record): bool
     {
         return auth()->user()->can('update_riwayat::kegiatan');
     }
-    
+
     public static function canDelete($record): bool
     {
         return auth()->user()->can('delete_riwayat::kegiatan');
@@ -72,7 +74,7 @@ class RiwayatKegiatanResource extends Resource
         if (!auth()->user()->can('view_any_riwayat::kegiatan')) {
             abort(403, 'Unauthorized access to Riwayat Kegiatan');
         }
-        
+
         return parent::getEloquentQuery();
     }
 
@@ -82,30 +84,30 @@ class RiwayatKegiatanResource extends Resource
             ->schema([
                 // Form untuk dokumentasi dan catatan
                 Forms\Components\Section::make('Tambah Dokumentasi')
-                ->schema([
-                    Forms\Components\FileUpload::make('documentation_files')
-                        ->label('File Dokumentasi')
-                        ->directory('documentations')
-                        ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
-                        ->maxSize(15360) // 15MB dalam KB
-                        ->multiple()
-                        ->columnSpanFull()
-                        ->helperText('Unggah file gambar dengan format JPG, JPEG, atau PNG. Maksimal ukuran file 15 MB.')
-                        ->afterStateUpdated(function ($state, $record, $set) {
-                            // Simpan ke model Documentation ketika file diupload
-                            if ($state && $record && $record->activity_id) {
-                                Documentation::create([
-                                    'activity_id' => $record->activity_id,
-                                    'file_path' => $state,
-                                    'uploaded_by' => Auth::id(),
-                                ]);
-                            }
-                        })
-                        ->dehydrated(false), // Tidak disimpan ke UserActivity
-                ])
-                ->collapsible()
-                ->visible(fn ($record) => $record && $record->activity_id),
-                    
+                    ->schema([
+                        Forms\Components\FileUpload::make('documentation_files')
+                            ->label('File Dokumentasi')
+                            ->directory('documentations')
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
+                            ->maxSize(15360) // 15MB dalam KB
+                            ->multiple()
+                            ->columnSpanFull()
+                            ->helperText('Unggah file gambar dengan format JPG, JPEG, atau PNG. Maksimal ukuran file 15 MB.')
+                            ->afterStateUpdated(function ($state, $record, $set) {
+                                // Simpan ke model Documentation ketika file diupload
+                                if ($state && $record && $record->activity_id) {
+                                    Documentation::create([
+                                        'activity_id' => $record->activity_id,
+                                        'file_path' => $state,
+                                        'uploaded_by' => Auth::id(),
+                                    ]);
+                                }
+                            })
+                            ->dehydrated(false), // Tidak disimpan ke UserActivity
+                    ])
+                    ->collapsible()
+                    ->visible(fn($record) => $record && $record->activity_id),
+
                 Forms\Components\Section::make('Tambah Catatan')
                     ->schema([
                         Forms\Components\Textarea::make('note')
@@ -120,7 +122,7 @@ class RiwayatKegiatanResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn (Builder $query) => $query->where('user_id', Auth::id())->with(['activity', 'activity.categories']))
+            ->modifyQueryUsing(fn(Builder $query) => $query->where('user_id', Auth::id())->with(['activity', 'activity.categories']))
             ->columns([
                 TextColumn::make('activity.title')
                     ->label('Judul Kegiatan')
@@ -130,7 +132,7 @@ class RiwayatKegiatanResource extends Resource
                     ->extraAttributes([
                         'style' => 'width: 200px; max-width: 200px;'
                     ]),
-                    
+
                 TextColumn::make('activity.type')
                     ->label('Jenis')
                     ->badge()
@@ -138,14 +140,14 @@ class RiwayatKegiatanResource extends Resource
                         'primary' => 'inhouse',
                         'warning' => 'exhouse',
                     ]),
-                    
+
                 TextColumn::make('activity.categories.name')
                     ->label('Kategori')
                     ->badge()
                     ->separator(', ')
                     ->placeholder('not set')
                     ->wrap(),
-                    
+
                 TextColumn::make('activity.speaker')
                     ->label('Pemateri')
                     ->searchable()
@@ -154,13 +156,13 @@ class RiwayatKegiatanResource extends Resource
                         'style' => 'width: 100px; max-width: 100px;'
                     ])
                     ->limit(30),
-                    
+
                 TextColumn::make('activity.organizer')
                     ->label('Penyelenggara')
                     ->searchable()
                     ->wrap()
                     ->limit(30),
-                    
+
                 TextColumn::make('activity.location')
                     ->label('Lokasi')
                     ->searchable()
@@ -169,28 +171,40 @@ class RiwayatKegiatanResource extends Resource
                         'style' => 'width: 200px; max-width: 200px;'
                     ])
                     ->limit(30),
-                    
+
                 TextColumn::make('activity.start_date')
                     ->label('Tanggal Mulai')
                     ->date('d M Y')
                     ->sortable(),
-                    
+
                 TextColumn::make('activity.finish_date')
                     ->label('Tanggal Selesai')
                     ->date('d M Y')
                     ->sortable(),
-                    
+
                 TextColumn::make('activity.duration')
                     ->label('Durasi')
                     ->suffix(' JPL')
                     ->alignCenter(),
-                    
+
                 TextColumn::make('attendances_count')
                     ->label('Kehadiran')
                     ->counts('attendances')
                     ->suffix(' hari')
                     ->alignCenter(),
-                    
+
+                 TextColumn::make('certificate_status')
+                    ->label('Sertifikat')
+                    ->state(function (UserActivity $record): string {
+                        $docCount = Certificate::where('activity_id', $record->activity_id)
+                            ->where('user_id', Auth::id())
+                            ->count();
+                        return $docCount > 0 ? "Ada ({$docCount})" : 'Belum ada';
+                    })
+                    ->badge()
+                    ->color(fn(string $state): string => str_contains($state, 'Ada') ? 'success' : 'danger'),
+
+
                 TextColumn::make('documentation_status')
                     ->label('Dokumentasi')
                     ->state(function (UserActivity $record): string {
@@ -200,8 +214,8 @@ class RiwayatKegiatanResource extends Resource
                         return $docCount > 0 ? "Ada ({$docCount})" : 'Belum ada';
                     })
                     ->badge()
-                    ->color(fn (string $state): string => str_contains($state, 'Ada') ? 'success' : 'danger'),
-                    
+                    ->color(fn(string $state): string => str_contains($state, 'Ada') ? 'success' : 'danger'),
+
                 TextColumn::make('notes_status')
                     ->label('Catatan')
                     ->state(function (UserActivity $record): string {
@@ -211,7 +225,7 @@ class RiwayatKegiatanResource extends Resource
                         return $noteCount > 0 ? "Ada ({$noteCount})" : 'Belum ada';
                     })
                     ->badge()
-                    ->color(fn (string $state): string => str_contains($state, 'Ada') ? 'success' : 'danger'),
+                    ->color(fn(string $state): string => str_contains($state, 'Ada') ? 'success' : 'danger'),
             ])
             ->filters([
                 SelectFilter::make('activity.type')
@@ -219,7 +233,7 @@ class RiwayatKegiatanResource extends Resource
                     ->relationship('activity', 'type')
                     ->searchable()
                     ->preload(),
-                    
+
                 Tables\Filters\Filter::make('start_date')
                     ->form([
                         Forms\Components\DatePicker::make('start_from')
@@ -231,11 +245,11 @@ class RiwayatKegiatanResource extends Resource
                         return $query
                             ->when(
                                 $data['start_from'],
-                                fn (Builder $query, $date): Builder => $query->whereHas('activity', fn ($query) => $query->whereDate('start_date', '>=', $date)),
+                                fn(Builder $query, $date): Builder => $query->whereHas('activity', fn($query) => $query->whereDate('start_date', '>=', $date)),
                             )
                             ->when(
                                 $data['start_until'],
-                                fn (Builder $query, $date): Builder => $query->whereHas('activity', fn ($query) => $query->whereDate('start_date', '<=', $date)),
+                                fn(Builder $query, $date): Builder => $query->whereHas('activity', fn($query) => $query->whereDate('start_date', '<=', $date)),
                             );
                     })
             ])
@@ -244,7 +258,50 @@ class RiwayatKegiatanResource extends Resource
                     ->label('Lihat Detail')
                     ->color('info')
                     ->visible(fn() => auth()->user()->can('view_riwayat::kegiatan')),
-                    
+
+                Action::make('add_certificate')
+                    ->label('Tambah Sertifikat')
+                    ->icon('heroicon-o-document-arrow-up')
+                    ->color('primary')
+                    ->visible(fn() => auth()->user()->can('create_certificate'))
+                    ->form([
+                        Forms\Components\FileUpload::make('certificate')
+                            ->label('File Sertifikat')
+                            ->directory('certificates')
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'])
+                            ->maxSize(5120) // 5MB = 5120 KB
+                            ->required()
+                            ->helperText('Unggah file JPG, PNG, atau PDF. Maks 5 MB.')
+                            ->preserveFilenames(), // Tambahkan ini untuk mempertahankan nama file asli
+                    ])
+                    ->action(function (UserActivity $record, array $data): void {
+                        // Ambil file yang diupload
+                        $uploadedFile = $data['certificate'];
+                        
+                        // Jika file adalah string (path), ambil nama file dari path
+                        if (is_string($uploadedFile)) {
+                            $fileName = basename($uploadedFile);
+                        } else {
+                            // Jika file adalah UploadedFile object, ambil nama asli
+                            $fileName = $uploadedFile instanceof UploadedFile ? $uploadedFile->getClientOriginalName() : basename($uploadedFile);
+                        }
+
+                        \App\Models\Certificate::create([
+                            'activity_id' => $record->activity_id,
+                            'user_id' => Auth::id(),
+                            'name' => $uploadedFile, // Path file di storage
+                            'original_name' => $fileName, // Nama asli file
+                        ]);
+
+                        Notification::make()
+                            ->title('Berhasil')
+                            ->body('Sertifikat berhasil ditambahkan.')
+                            ->success()
+                            ->send();
+                    })
+                    ->modalHeading('Upload Sertifikat'),
+
+
                 Action::make('add_documentation')
                     ->label('Tambah Dokumentasi')
                     ->icon('heroicon-o-camera')
@@ -255,10 +312,10 @@ class RiwayatKegiatanResource extends Resource
                             ->label('File Dokumentasi')
                             ->directory('documentations')
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
-                            ->maxSize(15360) // 15MB dalam KB
+                            ->maxSize(5120) // 15MB dalam KB
                             ->multiple()
                             ->required()
-                            ->helperText('Unggah file gambar dengan format JPG, JPEG, atau PNG. Maksimal ukuran file 15 MB.'),
+                            ->helperText('Unggah file gambar dengan format JPG, JPEG, atau PNG. Maksimal ukuran file 5 MB.'),
                     ])
                     ->action(function (UserActivity $record, array $data): void {
                         foreach ($data['documentation'] as $file) {
@@ -268,15 +325,15 @@ class RiwayatKegiatanResource extends Resource
                                 'user_id' => Auth::id(),
                             ]);
                             Notification::make()
-                        ->title('Upload Berhasil')
-                        ->body('Dokumentasi berhasil diupload!')
-                        ->success()
-                        ->send();
+                                ->title('Upload Berhasil')
+                                ->body('Dokumentasi berhasil diupload!')
+                                ->success()
+                                ->send();
                         }
                     })
                     ->successNotificationTitle('Dokumentasi berhasil ditambahkan')
                     ->modalHeading('Tambah Dokumentasi Kegiatan'),
-                    
+
                 Action::make('add_note')
                     ->label('Tambah Catatan')
                     ->icon('heroicon-o-pencil-square')
