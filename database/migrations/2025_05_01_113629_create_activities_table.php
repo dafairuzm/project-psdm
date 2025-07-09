@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('activities', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->enum('type', ['exhouse', 'inhouse']);
+            $table->longText('reference')->nullable();
+            $table->enum('type', ['dinas', 'mandiri']);
             $table->string('organizer')->nullable();
             $table->string('location')->nullable();
             $table->dateTime('start_date');

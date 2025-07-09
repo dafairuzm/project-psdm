@@ -97,7 +97,7 @@ class UserActivitiesImport implements ToCollection, WithHeadingRow, WithValidati
                 $user = User::create([
                     'name' => $nama,
                     'email' => $this->generateEmail($nama),
-                    'password' => bcrypt('password123'), // Default password
+                    'password' => bcrypt('psdmiskak'), // Default password
                     'nip' => null, // Biarkan kosong
                     'employee_class' => $employeeClass,
                     'job_title' => $jobTitle,

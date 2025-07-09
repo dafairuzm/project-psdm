@@ -146,9 +146,11 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('nip')
                     ->label('NIP')
                     ->searchable()
+                    ->placeholder('-')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
+                    ->placeholder('-')
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('roles.name')
                     ->searchable()
@@ -164,15 +166,18 @@ class UserResource extends Resource
                     ->label('Unit/Ruangan')
                     ->searchable()
                     ->sortable()
+                    ->placeholder('-')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('profession.name')
                     ->label('Profesi')
                     ->searchable()
                     ->sortable()
+                    ->placeholder('-')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('job_title')
                     ->label('Jabatan')
                     ->searchable()
+                    ->placeholder('-')
                     ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Dibuat')

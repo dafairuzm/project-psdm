@@ -18,7 +18,7 @@ class UserActivityExport implements FromCollection, WithHeadings, WithEvents
 {
     protected $records;
     protected int $counter = 1;
-    protected $unitStats;
+    protected $professionStats;
 
     public function __construct(Collection $records)
     {
@@ -30,8 +30,8 @@ class UserActivityExport implements FromCollection, WithHeadings, WithEvents
     protected function calculateUnitStats()
     {
         // Hitung statistik per unit
-        $this->unitStats = $this->records->load(['user.unit'])
-            ->groupBy('user.unit.name')
+        $this->professionStats = $this->records->load(['user.profession'])
+            ->groupBy('user.profession.name')
             ->map(function ($group) {
                 return $group->count();
             })
@@ -42,7 +42,7 @@ class UserActivityExport implements FromCollection, WithHeadings, WithEvents
     {
         $this->counter = 1;
         
-        return $this->records->load(['user.unit', 'activity.categories'])->map(function ($item) {
+        return $this->records->load(['user.profession', 'activity.categories'])->map(function ($item) {
 
             $title = $item->activity->title ?? '';
             $organizer = $item->activity->organizer ?? '';
@@ -109,7 +109,7 @@ class UserActivityExport implements FromCollection, WithHeadings, WithEvents
                 $sheet->setCellValue('A2', 'DIKLAT / BIMTEK / WORKSHOP / SEMINAR EXHOUSE');
 
                 $sheet->mergeCells('A3:K3');
-                $sheet->setCellValue('A3', 'TAHUN 2024');
+                $sheet->setCellValue('A3', 'TAHUN -');
 
                 // Center align semua judul (A1 sampai A3)
                 $sheet->getStyle('A1:K3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -166,7 +166,7 @@ class UserActivityExport implements FromCollection, WithHeadings, WithEvents
                 
                 // Judul statistik
                 $sheet->mergeCells("A{$statsStartRow}:C{$statsStartRow}");
-                $sheet->setCellValue("A{$statsStartRow}", 'STATISTIK KEGIATAN PER UNIT');
+                $sheet->setCellValue("A{$statsStartRow}", 'STATISTIK KEGIATAN PER PROFESI');
                 $sheet->getStyle("A{$statsStartRow}:C{$statsStartRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
                 $sheet->getStyle("A{$statsStartRow}:C{$statsStartRow}")->getFont()->setBold(true);
                 $sheet->getStyle("A{$statsStartRow}:C{$statsStartRow}")->getFont()->setSize(12);
@@ -194,9 +194,9 @@ class UserActivityExport implements FromCollection, WithHeadings, WithEvents
                 $no = 1;
                 $totalKegiatan = 0;
                 
-                foreach ($this->unitStats as $unitName => $count) {
+                foreach ($this->professionStats as $professionName => $count) {
                     $sheet->setCellValue("A{$dataRow}", $no++);
-                    $sheet->setCellValue("B{$dataRow}", $unitName ?: 'Unit Tidak Diketahui');
+                    $sheet->setCellValue("B{$dataRow}", $professionName ?: 'Profesi lainnya');
                     $sheet->setCellValue("C{$dataRow}", $count);
                     $totalKegiatan += $count;
                     $dataRow++;

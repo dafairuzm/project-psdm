@@ -34,13 +34,13 @@ class ListUserActivities extends ListRecords
                         ->disableLabel()
                         ->content(new HtmlString('
                             <div class="p-3 bg-gray-50 border border-gray-200 rounded-md">
-                                <a href="' . asset('storage/templates/Data Kegiatan Example .xlsx') . '" 
-                                download="Data Kegiatan Example .xlsx"
+                                <a href="' . asset('storage/templates/Data Kegiatan Example.xlsx') . '" 
+                                download="Data Kegiatan Example.xlsx"
                                 class="text-emerald-600 hover:text-grey-800 underline text-md font-medium">
                                     Download Template
                                 </a>
                             </div>
-    ')),
+                ')),
 
                     FileUpload::make('file')
                         ->label('File Excel')
@@ -130,19 +130,19 @@ class ListUserActivities extends ListRecords
     {
         return [
             'all' => Tab::make()
-                ->label('Semua Kegiatan'),
-            'exhouse' => Tab::make()
-                ->label('Kegiatan Exhouse')
+                ->label('Semua'),
+            'dinas' => Tab::make()
+                ->label('Dinas')
                 ->modifyQueryUsing(function (Builder $query) {
                     return $query->whereHas('activity', function ($q) {
-                        $q->where('type', 'exhouse');
+                        $q->where('type', 'dinas');
                     });
                 }),
-            'inhouse' => Tab::make()
-                ->label('Kegiatan Inhouse')
+            'mandiri' => Tab::make()
+                ->label('Mandiri')
                 ->modifyQueryUsing(function (Builder $query) {
                     return $query->whereHas('activity', function ($q) {
-                        $q->where('type', 'inhouse');
+                        $q->where('type', 'mandiri');
                     });
                 }),
         ];

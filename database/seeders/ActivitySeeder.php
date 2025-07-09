@@ -15,7 +15,7 @@ class ActivitySeeder extends Seeder
     {
         Activity::create([
             'title' => 'Seminar Dokter Jaya',
-            'type' => 'Inhouse',
+            'type' => 'Dinas',
             'organizer' => 'Divisi Pelatihan',
             'location' => 'Ruang 401, Gedung A',
             'start_date' => Carbon::parse('2025-05-15'),
@@ -24,7 +24,7 @@ class ActivitySeeder extends Seeder
         ]);
         Activity::create([
             'title' => 'Workshop Digital',
-            'type' => 'Inhouse',
+            'type' => 'Dinas',
             'organizer' => 'PMI',
             'location' => 'Ruang 401, Gedung A',
             'start_date' => Carbon::parse('2025-05-15'),
@@ -33,7 +33,7 @@ class ActivitySeeder extends Seeder
         ]);
         Activity::create([
             'title' => 'Diklat Dokter Gigi',
-            'type' => 'Exhouse',
+            'type' => 'Mandiri',
             'organizer' => 'Kemenkes',
             'location' => 'Ruang 401, Gedung A',
             'start_date' => Carbon::parse('2025-05-15'),

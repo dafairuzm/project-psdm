@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Exports\UserActivityExport;
 use App\Filament\Resources\UserActivityResource\Pages;
-use App\Filament\Resources\UserActivityResource\RelationManagers;
 use App\Models\ActivityCategory;
 use App\Models\Report;
 use App\Models\UserActivity;
@@ -70,17 +69,22 @@ class UserActivityResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.employee_class')
                     ->label('Pangkat/Gol')
-                    ->placeholder('not set'),
+                    ->placeholder('-'),
                 Tables\Columns\TextColumn::make('user.job_title')
                     ->label('Jabatan')
                     ->searchable()
                     ->placeholder('not set'),
+                Tables\Columns\TextColumn::make('user.unit.name')
+                    ->label('Unit Kerja')
+                    ->searchable()
+                    ->placeholder('not set')
+                    ->toggleable(isToggledHiddenByDefault: false),
                 Tables\Columns\BadgeColumn::make('activity.type')
                     ->label('Tipe')
                     ->searchable()
                     ->colors([
-                        'primary' => 'inhouse',
-                        'warning' => 'exhouse',
+                        'primary' => 'dinas',
+                        'warning' => 'mandiri',
                     ]),
                 Tables\Columns\TextColumn::make('activity.title')
                     ->label('Kegiatan')
@@ -115,6 +119,12 @@ class UserActivityResource extends Resource
                     ->limit(60)
                     ->placeholder('not set')
                     ->wrap(),
+                Tables\Columns\TextColumn::make('activity.duration')
+                    ->label('Durasi')
+                    ->numeric()
+                    ->sortable()
+                    ->suffix(' JPL')
+                    ->placeholder('not set'),
             ])
             ->filters([
                 Tables\Filters\Filter::make('date_range')
@@ -138,20 +148,58 @@ class UserActivityResource extends Resource
                         );
                     }),
 
-                SelectFilter::make('activity.type')
+                    SelectFilter::make('activity_type')
                     ->label('Tipe Kegiatan')
                     ->options([
-                        'exhouse' => 'Exhouse',
-                        'inhouse' => 'Inhouse',
-                    ]),
-                    
-                SelectFilter::make('categories.name')
-                    ->label('Kategori Kegiatan'),
+                        'dinas' => 'Dinas',
+                        'mandiri' => 'Mandiri',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        return $query->when(
+                            $data['value'],
+                            fn($q) => $q->whereHas('activity', function ($q) use ($data) {
+                                $q->where('type', $data['value']);
+                            })
+                        );
+                    }),
+
+                    SelectFilter::make('activity_categories')
+                    ->label('Kategori Kegiatan')
+                    ->options(function () {
+                        return ActivityCategory::pluck('name', 'id')->toArray();
+                    })
+                    ->query(function (Builder $query, array $data) {
+                        if (!$data['value']) {
+                            return $query;
+                        }
+                        
+                        // Ambil activity_id yang memiliki kategori tertentu
+                        $activityIds = \DB::table('activity_activity_category')
+                            ->where('activity_category_id', $data['value'])
+                            ->pluck('activity_id');
+                            
+                        return $query->whereIn('activity_id', $activityIds);
+                    }),
+
+                    SelectFilter::make('user_unit')
+                    ->label('Unit Kerja')
+                    ->searchable()
+                    ->options(function () {
+                        return \App\Models\Unit::pluck('name', 'id')->toArray();
+                    })
+                    ->query(function (Builder $query, array $data) {
+                        return $query->when(
+                            $data['value'],
+                            fn($q) => $q->whereHas('user', function ($userQuery) use ($data) {
+                                $userQuery->where('unit_id', $data['value']);
+                            })
+                        );
+                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 // Tables\Actions\EditAction::make(),
-                ])
+            ])
             ->recordAction('view')
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -210,12 +258,30 @@ class UserActivityResource extends Resource
                                             ->label('Jabatan'),
                                     ]),
                                     Group::make([
+                                        TextEntry::make('activity.reference')
+                                            ->label('Dasar Surat')
+                                            ->getStateUsing(function ($record) {
+                                                $references = $record->activity->reference;
+
+                                                if (!$references || !is_array($references)) {
+                                                    return 'Tidak ada dasar surat';
+                                                }
+
+                                                $formattedList = [];
+                                                foreach ($references as $index => $item) {
+                                                    $title = is_array($item) ? ($item['title'] ?? 'Tanpa judul') : $item;
+                                                    $formattedList[] = ($index + 1) . '. ' . $title;
+                                                }
+
+                                                return implode('<br>', $formattedList);
+                                            })
+                                            ->html(),
                                         TextEntry::make('activity.type')
                                             ->label('Tipe')
                                             ->badge()
                                             ->colors([
-                                                'primary' => 'inhouse',
-                                                'warning' => 'exhouse',
+                                                'primary' => 'dinas',
+                                                'warning' => 'mandiri',
                                             ]),
                                         TextEntry::make('activity.title')
                                             ->label('Kegiatan'),
@@ -272,5 +338,5 @@ class UserActivityResource extends Resource
         return parent::getEloquentQuery()
             ->orderBy('created_at', 'desc');
     }
-    
+
 }
