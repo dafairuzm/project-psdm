@@ -49,6 +49,9 @@ class Activity extends Model
     {
         return $this->hasMany(Note::class);
     }
-
+    public function certificates()
+    {
+        return $this->hasMany(Certificate::class);
+    }
 
 }
