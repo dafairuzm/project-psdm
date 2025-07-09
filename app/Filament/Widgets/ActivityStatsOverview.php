@@ -81,8 +81,8 @@ class ActivityStatsOverview extends BaseWidget
 
         // Mengambil data chart
         $allActivitiesChart = $getChartData();
-        $exhouseChart = $getChartData('exhouse');
-        $inhouseChart = $getChartData('inhouse');
+        $exhouseChart = $getChartData('dinas');
+        $inhouseChart = $getChartData('mandiri');
 
         // Menentukan apakah menggunakan periode mingguan atau bulanan
         $isWeeklyPeriod = $periods <= 2;
@@ -90,11 +90,11 @@ class ActivityStatsOverview extends BaseWidget
         // Menghitung total untuk range yang dipilih berdasarkan start_date saja
         $totalActivities = Activity::whereBetween('start_date', [$startDate, $endDate])->count();
             
-        $totalExhouse = Activity::where('type', 'exhouse')
+        $totalExhouse = Activity::where('type', 'dinas')
             ->whereBetween('start_date', [$startDate, $endDate])
             ->count();
             
-        $totalInhouse = Activity::where('type', 'inhouse')
+        $totalInhouse = Activity::where('type', 'mandiri')
             ->whereBetween('start_date', [$startDate, $endDate])
             ->count();
 
@@ -105,13 +105,13 @@ class ActivityStatsOverview extends BaseWidget
                 ->descriptionIcon($this->getChartTrendIcon($allActivitiesChart))
                 ->color($this->getChartTrendColor($allActivitiesChart)),
                 
-            Stat::make('Kegiatan Exhouse', $totalExhouse)
+            Stat::make('Kegiatan Dinas/Ditugaskan', $totalExhouse)
                 ->chart($exhouseChart)
                 ->description($this->getChartDescription($exhouseChart, $isWeeklyPeriod))
                 ->descriptionIcon($this->getChartTrendIcon($exhouseChart))
                 ->color($this->getChartTrendColor($exhouseChart)),
                 
-            Stat::make('Kegiatan Inhouse', $totalInhouse)
+            Stat::make('Kegiatan Mandiri', $totalInhouse)
                 ->chart($inhouseChart)
                 ->description($this->getChartDescription($inhouseChart, $isWeeklyPeriod))
                 ->descriptionIcon($this->getChartTrendIcon($inhouseChart))

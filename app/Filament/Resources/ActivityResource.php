@@ -11,14 +11,12 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Tables\Enums\FiltersLayout;
-use App\Filament\Resources\ActivityResource\RelationManagers\UserActivityRelationManager;
 use Filament\Pages\SubNavigationPosition;
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\Section;
+// use Filament\Forms\Components\Section;
 use Filament\Infolists\Components\Split;
 
 class ActivityResource extends Resource
@@ -41,44 +39,61 @@ class ActivityResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->label('Judul Kegiatan')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('type')
-                    ->label('Tipe Kegiatan')
-                    ->options([
-                        'exhouse' => 'Exhouse',
-                        'inhouse' => 'Inhouse',
-                    ])
-                    ->required(),
-                Forms\Components\MultiSelect::make('categories')
-                    ->relationship('categories', 'name')
-                    ->columns(2)
-                    ->preload()
-                    ->label('Kategori'),
-                Forms\Components\TextInput::make('organizer')
-                    ->label('Penyelenggara')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('location')
-                    ->label('Lokasi')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('start_date')
-                    ->label('Tanggal Mulai')
-                    ->required()
-                    ->format('Y-m-d'),
-                Forms\Components\DatePicker::make('finish_date')
-                    ->label('Tanggal Selesai')
-                    ->required()
-                    ->rule('after_or_equal:start_date')
-                    ->format('Y-m-d'),
-                Forms\Components\TextInput::make('duration')
-                    ->label('Durasi (Jam pelajaran)')
-                    ->numeric()
-                    ->required()
-                    ->minValue(1),
+                Forms\Components\Section::make('Dasar Surat')
+                    ->schema([
+                        Forms\Components\Repeater::make('reference')
+                            ->hiddenLabel()
+                            ->schema([
+                                Forms\Components\Textarea::make('title')
+                                    ->label('Judul Surat')
+                                    ->required()
+                                    ->rows(3)
+                                    ->maxLength(1000),
+                            ])
+                            ->defaultItems(1)
+                            ->addActionLabel('Tambah Dasar Surat')
+                    ])->collapsible(),
+                Forms\Components\Section::make('Detail Kegiatan')
+                    ->schema([
+                        Forms\Components\TextInput::make('title')
+                            ->label('Judul Kegiatan')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Select::make('type')
+                            ->label('Tipe Kegiatan')
+                            ->options([
+                                'dinas' => 'Dinas',
+                                'mandiri' => 'Mandiri',
+                            ])
+                            ->required(),
+                        Forms\Components\MultiSelect::make('categories')
+                            ->relationship('categories', 'name')
+                            ->columns(2)
+                            ->preload()
+                            ->label('Kategori'),
+                        Forms\Components\TextInput::make('organizer')
+                            ->label('Penyelenggara')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('location')
+                            ->label('Lokasi')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\DatePicker::make('start_date')
+                            ->label('Tanggal Mulai')
+                            ->required()
+                            ->format('Y-m-d'),
+                        Forms\Components\DatePicker::make('finish_date')
+                            ->label('Tanggal Selesai')
+                            ->required()
+                            ->rule('after_or_equal:start_date')
+                            ->format('Y-m-d'),
+                        Forms\Components\TextInput::make('duration')
+                            ->label('Durasi (Jam pelajaran)')
+                            ->numeric()
+                            ->required()
+                            ->minValue(1),
+                    ])->collapsible()->columns(2),
             ]);
     }
 
@@ -98,8 +113,8 @@ class ActivityResource extends Resource
                     ->label('Tipe')
                     ->searchable()
                     ->colors([
-                        'primary' => 'inhouse',
-                        'warning' => 'exhouse',
+                        'primary' => 'dinas',
+                        'warning' => 'mandiri',
                     ]),
                 Tables\Columns\TextColumn::make('categories.name')
                     ->label('Kategori')
@@ -159,8 +174,8 @@ class ActivityResource extends Resource
                 Tables\Filters\SelectFilter::make('type')
                     ->label('Tipe Kegiatan')
                     ->options([
-                        'exhouse' => 'Exhouse',
-                        'inhouse' => 'Inhouse',
+                        'dinas' => 'Dinas',
+                        'mandiri' => 'Mandiri',
                     ]),
 
                 Tables\Filters\SelectFilter::make('categories')
@@ -182,7 +197,28 @@ class ActivityResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Informasi Utama')
+                Section::make('Dasar')
+                    ->schema([
+                        TextEntry::make('reference')
+                            ->label('Dasar Surat')
+                            ->getStateUsing(function ($record) {
+                                $references = $record->reference;
+
+                                if (!$references || !is_array($references)) {
+                                    return 'Tidak ada dasar surat';
+                                }
+
+                                $formattedList = [];
+                                foreach ($references as $index => $item) {
+                                    $title = is_array($item) ? ($item['title'] ?? 'Tanpa judul') : $item;
+                                    $formattedList[] = ($index + 1) . '. ' . $title;
+                                }
+
+                                return implode('<br>', $formattedList);
+                            })
+                            ->html(), // Tambahkan ini untuk render HTML
+                    ]),
+                Section::make('Detail Kegiatan')
                     ->schema([
                         Split::make([
                             Components\Grid::make(2)

@@ -12,6 +12,7 @@ class Activity extends Model
 
     protected $fillable = [
         'title',
+        'reference',
         'type',
         'category_id',
         'organizer',
@@ -22,6 +23,7 @@ class Activity extends Model
     ];
 
     protected $casts = [
+        'reference' => 'array',
         'start_date' => 'date',
         'finish_date' => 'date',
     ];
