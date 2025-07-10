@@ -229,7 +229,7 @@ class ActivityResource extends Resource
                                         TextEntry::make('type')
                                             ->label('Tipe Kegiatan')
                                             ->badge()
-                                            ->color(fn(string $state): string => $state === 'inhouse' ? 'success' : 'info'),
+                                            ->color(fn(string $state): string => $state === 'dinas' ? 'primary' : 'warning'),
                                         TextEntry::make('categories.name')
                                             ->label('Kategori')
                                             ->badge()

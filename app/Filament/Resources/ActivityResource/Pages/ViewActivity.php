@@ -35,7 +35,7 @@ class ViewActivity extends ViewRecord
             Actions\Action::make('generateSuratTugas')
                 ->label('Generate Surat Tugas')
                 ->icon('heroicon-o-document-text')
-                ->color('success')
+                ->color('warning')
                 ->action(function () {
                     $this->redirect(route('download.surat-tugas', $this->record->id));
                 })

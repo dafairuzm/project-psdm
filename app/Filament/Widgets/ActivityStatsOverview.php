@@ -29,8 +29,11 @@ class ActivityStatsOverview extends BaseWidget
         $diffInDays = $startDate->diffInDays($endDate);
         $periods = max(1, min(12, (int) ceil($diffInDays / 30))); // Maksimal 12 periode
 
+        // Cek apakah user adalah pegawai
+        $isPegawai = auth()->user()->hasRole('Pegawai');
+        
         // Fungsi untuk mengambil data chart berdasarkan periode yang dipilih
-        $getChartData = function($type = null) use ($startDate, $endDate, $periods) {
+        $getChartData = function($type = null) use ($startDate, $endDate, $periods, $isPegawai) {
             $data = [];
             
             // Jika periode kurang dari 2 bulan, gunakan data mingguan
@@ -46,6 +49,13 @@ class ActivityStatsOverview extends BaseWidget
                     
                     // Kegiatan berdasarkan start_date saja
                     $query = Activity::whereBetween('start_date', [$weekStart, $weekEnd]);
+                    
+                    // Filter berdasarkan user jika role pegawai melalui tabel pivot
+                    if ($isPegawai) {
+                        $query->whereHas('users', function($q) {
+                            $q->where('users.id', auth()->id());
+                        });
+                    }
                     
                     if ($type) {
                         $query->where('type', $type);
@@ -69,6 +79,13 @@ class ActivityStatsOverview extends BaseWidget
                     // Kegiatan berdasarkan start_date saja
                     $query = Activity::whereBetween('start_date', [$monthStart, $monthEnd]);
                     
+                    // Filter berdasarkan user jika role pegawai melalui tabel pivot
+                    if ($isPegawai) {
+                        $query->whereHas('users', function($q) {
+                            $q->where('users.id', auth()->id());
+                        });
+                    }
+                    
                     if ($type) {
                         $query->where('type', $type);
                     }
@@ -88,55 +105,90 @@ class ActivityStatsOverview extends BaseWidget
         $isWeeklyPeriod = $periods <= 2;
 
         // Menghitung total untuk range yang dipilih berdasarkan start_date saja
-        $totalActivities = Activity::whereBetween('start_date', [$startDate, $endDate])->count();
-            
-        $totalExhouse = Activity::where('type', 'dinas')
-            ->whereBetween('start_date', [$startDate, $endDate])
-            ->count();
-            
-        $totalInhouse = Activity::where('type', 'mandiri')
-            ->whereBetween('start_date', [$startDate, $endDate])
-            ->count();
+        $totalActivitiesQuery = Activity::whereBetween('start_date', [$startDate, $endDate]);
+        $totalExhouseQuery = Activity::where('type', 'dinas')
+            ->whereBetween('start_date', [$startDate, $endDate]);
+        $totalInhouseQuery = Activity::where('type', 'mandiri')
+            ->whereBetween('start_date', [$startDate, $endDate]);
+
+        // Filter berdasarkan user jika role pegawai melalui tabel pivot
+        if ($isPegawai) {
+            $totalActivitiesQuery->whereHas('users', function($q) {
+                $q->where('users.id', auth()->id());
+            });
+            $totalExhouseQuery->whereHas('users', function($q) {
+                $q->where('users.id', auth()->id());
+            });
+            $totalInhouseQuery->whereHas('users', function($q) {
+                $q->where('users.id', auth()->id());
+            });
+        }
+
+        $totalActivities = $totalActivitiesQuery->count();
+        $totalExhouse = $totalExhouseQuery->count();
+        $totalInhouse = $totalInhouseQuery->count();
+
+        // Ubah label jika user adalah pegawai
+        $labelPrefix = $isPegawai ? '' : '';
 
         return [
-            Stat::make('Semua Kegiatan', $totalActivities)
+            Stat::make($labelPrefix . 'Semua Kegiatan', $totalActivities)
                 ->chart($allActivitiesChart)
-                ->description($this->getChartDescription($allActivitiesChart, $isWeeklyPeriod))
+                ->description($this->getChartDescription($allActivitiesChart, $isWeeklyPeriod, $totalActivities))
                 ->descriptionIcon($this->getChartTrendIcon($allActivitiesChart))
                 ->color($this->getChartTrendColor($allActivitiesChart)),
                 
-            Stat::make('Kegiatan Dinas/Ditugaskan', $totalExhouse)
+            Stat::make($labelPrefix . 'Kegiatan Dinas/Ditugaskan', $totalExhouse)
                 ->chart($exhouseChart)
-                ->description($this->getChartDescription($exhouseChart, $isWeeklyPeriod))
+                ->description($this->getChartDescription($exhouseChart, $isWeeklyPeriod, $totalExhouse))
                 ->descriptionIcon($this->getChartTrendIcon($exhouseChart))
                 ->color($this->getChartTrendColor($exhouseChart)),
                 
-            Stat::make('Kegiatan Mandiri', $totalInhouse)
+            Stat::make($labelPrefix . 'Kegiatan Mandiri', $totalInhouse)
                 ->chart($inhouseChart)
-                ->description($this->getChartDescription($inhouseChart, $isWeeklyPeriod))
+                ->description($this->getChartDescription($inhouseChart, $isWeeklyPeriod, $totalInhouse))
                 ->descriptionIcon($this->getChartTrendIcon($inhouseChart))
                 ->color($this->getChartTrendColor($inhouseChart)),
         ];
     }
 
     // Fungsi helper untuk menghitung persentase perubahan
-    private function getChartDescription(array $chartData, bool $isWeeklyPeriod = false): string
+    private function getChartDescription(array $chartData, bool $isWeeklyPeriod = false, int $totalActivities = 0): string
     {
         if (count($chartData) < 2) {
-            return 'Data tidak cukup';
+            // Jika hanya 1 periode dan tidak ada aktivitas sama sekali
+            if ($totalActivities == 0) {
+                return 'Belum ada aktivitas';
+            }
+            return 'Data periode tunggal';
         }
         
         $current = end($chartData);
         $previous = $chartData[count($chartData) - 2];
         
+        // Jika kedua periode 0, tapi total ada aktivitas
         if ($previous == 0 && $current == 0) {
-            return 'Tidak ada aktivitas';
+            $periodText = $isWeeklyPeriod ? 'minggu' : 'bulan';
+            if ($totalActivities > 0) {
+                return "Tidak ada aktivitas di 2 {$periodText} terakhir";
+            } else {
+                return "Tidak ada aktivitas di 2 {$periodText} terakhir";
+            }
         }
         
-        if ($previous == 0) {
-            return 'Periode pertama';
+        // Jika periode sebelumnya 0 tapi periode ini ada
+        if ($previous == 0 && $current > 0) {
+            $periodText = $isWeeklyPeriod ? 'minggu lalu' : 'bulan lalu';
+            return "Meningkat dari 0 di {$periodText}";
         }
         
+        // Jika periode sebelumnya ada tapi periode ini 0
+        if ($previous > 0 && $current == 0) {
+            $periodText = $isWeeklyPeriod ? 'minggu lalu' : 'bulan lalu';
+            return "Menurun dari {$previous} di {$periodText}";
+        }
+        
+        // Kalkulasi persentase normal
         $percentChange = round((($current - $previous) / $previous) * 100, 1);
         $periodText = $isWeeklyPeriod ? 'minggu lalu' : 'bulan lalu';
         

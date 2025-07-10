@@ -104,7 +104,8 @@ class DocumentationResource extends Resource
                         return $createdBy . ', ' . $createdAt;
                     })
                     ->color('gray')
-                    ->size(TextColumn\TextColumnSize::Small),
+                    ->size(TextColumn\TextColumnSize::Small)
+                    ->sortable(),
             ])->space(0), 
         ])
         ->contentGrid([

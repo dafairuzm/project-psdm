@@ -16,18 +16,19 @@ use Carbon\Carbon;
 class Dashboard extends \Filament\Pages\Dashboard
 {
     use HasFiltersForm;
-    public static function canAccess(): bool
-    {
-        if (!auth()->check()) {
-            return false;
-        }
 
-        if (auth()->user()->hasRole('Pegawai')) {
-            return false;
-        }
+    // public static function canAccess(): bool
+    // {
+    //     if (!auth()->check()) {
+    //         return false;
+    //     }
 
-        return true;
-    }
+    //     if (auth()->user()->hasRole('Pegawai')) {
+    //         return false;
+    //     }
+
+    //     return true;
+    // }
 
     public function getTitle(): string
     {
@@ -97,7 +98,7 @@ class Dashboard extends \Filament\Pages\Dashboard
 public function getDefaultFilters(): array
 {
     return [
-        'startDate' => now()->subMonths(6)->format('Y-m-d'),
+        'startDate' => now()->subMonths(12)->format('Y-m-d'),
         'endDate' => now()->format('Y-m-d'),
     ];
 }

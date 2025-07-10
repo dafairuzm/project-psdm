@@ -12,6 +12,11 @@ class ProfessionActivityChart extends ChartWidget
 {
     protected static ?string $heading = 'Kegiatan per Profesi';
 
+    public static function canView(): bool
+    {
+        return !auth()->user()->hasRole('Pegawai');
+    }
+
     // protected int | string | array $columnSpan = 'full';
     protected int | string | array $columnSpan = [
         'default' => 'full',

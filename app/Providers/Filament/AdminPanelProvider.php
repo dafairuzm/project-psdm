@@ -28,6 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->font('Inter')
+            ->darkMode(false)
             ->colors([
                 'primary' => Color::Emerald,
             ])

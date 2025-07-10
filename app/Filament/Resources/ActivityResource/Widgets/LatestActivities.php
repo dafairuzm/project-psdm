@@ -13,6 +13,11 @@ use Illuminate\Database\Eloquent\Builder;
 class LatestActivities   extends BaseWidget
 {
     protected static ?string $heading = 'Latest Activities';
+
+    public static function canView(): bool
+    {
+        return !auth()->user()->hasRole('Pegawai');
+    }
     
     protected int | string | array $columnSpan = 'full';
     
