@@ -8,6 +8,7 @@ use App\Models\UserActivity;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Filament\Actions;
+use Filament\Actions\DeleteAction;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -311,6 +312,9 @@ class ManageUserActivities extends ManageRelatedRecords
                     ->modalContent(fn(UserActivity $record) => view('filament.attendance-modal', [
                         'attendances' => $record->attendances()->with('userActivity')->get(),
                     ])),
+                    Tables\Actions\DeleteAction::make()
+                    ->label("Hapus")
+                    ->modalHeading("Hapus peserta dari kegiatan?"),
             ])
             ->bulkActions([
                 // Optional bulk actions
