@@ -283,7 +283,7 @@ class ActivityResource extends Resource
                                 foreach ($certificates as $cert) {
                                     $fileName = basename($cert->name);
                                     $shortFileName = strlen($fileName) > 25 ? substr($fileName, 0, 22) . '...' : $fileName;
-                                    $url = asset('storage/' . $cert->name);
+                                    $url = \Illuminate\Support\Facades\Storage::url($cert->name);
                                     $date = $cert->created_at->format('d M Y, H:i');
                                     $extension = strtolower(pathinfo($cert->name, PATHINFO_EXTENSION));
 
@@ -292,8 +292,11 @@ class ActivityResource extends Resource
 
                                     if ($isImage) {
                                         $preview = '<div style="width: 100%; height: 200px; overflow: hidden; border-radius: 8px 8px 0 0; background-color: #f9fafb; position: relative;">
-                                            <img src="' . $url . '" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
-                                        </div>';
+                            <img src="' . $url . '" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'flex\';">
+                            <div style="display: none; width: 100%; height: 100%; background-color: #f3f4f6; align-items: center; justify-content: center; color: #6b7280; font-size: 14px;">
+                                Gambar tidak dapat dimuat
+                            </div>
+                        </div>';
                                         $fileType = 'Gambar';
                                     } elseif ($isPdf) {
                                         $preview = '<div style="width: 100%; height: 200px; background-color: #f3f4f6; border-radius: 8px 8px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #374151;">

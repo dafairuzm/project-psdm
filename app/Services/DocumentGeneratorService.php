@@ -5,9 +5,9 @@ namespace App\Services;
 use App\Models\Activity;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\TemplateProcessor;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use PhpOffice\PhpWord\TemplateProcessor;
 
 class DocumentGeneratorService
 {
